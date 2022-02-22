@@ -29,7 +29,6 @@ app.get("/guess", function (req, res) { //Queries guess, user, canGuess
 });
 /* YOUR CODE HERE */
 
-
 /*
 let acceptableGenre = [
     "scifi",
