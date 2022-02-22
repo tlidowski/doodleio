@@ -1,0 +1,147 @@
+/*GameRoom Elements*/
+
+.gameplayarea {
+	margin-left: auto;
+	margin-right: auto;
+}
+.drawingboard {
+	border: none;
+	width: 400px;
+	height: 400px;
+	background-color: #FFFFFF;
+}
+.leaderboard{
+	border: none;
+	width: 200px;
+	height: 400px;
+	background-color: grey;
+}
+
+.wordspace{
+	width: 601px;
+	height: 50px;
+	border: none;
+	background-color: #2292A4;
+}
+.guessspace{
+	border: none;
+	width: 601px;
+	height: 50px;
+	background-color: #2292A4;
+}
+
+/*Home Page Classes*/
+.logo {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 250px;
+	height: 75px;
+	padding: 10px;
+	
+}
+
+.about {
+	padding: 1rem;
+	margin: 2rem 0;
+	border-style: outset;
+	border-color: grey;
+	border-width: 20px;
+	background-color: white;
+}
+
+.options {
+	padding: 1rem;
+	margin: 2rem 0;
+	border: none;
+}
+
+body {
+	margin: 2rem;
+	cursor: url("img/brush-cursor.png"), auto;
+	background-image: url("img/bg-tessellation.png");
+	background-repeat: repeat;
+	background-size: 100px 100px;
+}
+
+table, tr, td {
+	border-collapse: collapse;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+h2, p {
+	text-align: center;
+	font-family: "Permanent Marker", auto;
+}
+
+.form {
+	padding: 1rem;
+	margin: 2rem 0;
+	border: 1px solid black;
+}
+.form label {
+	font-weight: bold;
+}
+.form div {
+	margin: 1rem 0;
+}
+
+#message {
+	margin: 1rem 0;
+}
+
+button {
+	border-radius: 8px;
+}
+
+.disabled { /* for disabling buttons (later use) */
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+/* Animated button code from w3 schools*/
+.animated-button {
+	border-radius: 8px;
+	background-color: #f4511e;
+	border: none;
+	color: #FFFFFF;
+	text-align: center;
+	font-size: 26px;
+	padding: 20px;
+	width: 200px;
+	transition: all 0.5s;
+	cursor: pointer;
+	margin: 5px;
+}
+  
+.animated-button span {
+	cursor: pointer;
+	position: relative;
+	transition: 0.5s;
+}
+  
+.animated-button span:after {
+	content: '\00bb';
+	position: absolute;
+	opacity: 0;
+	top: 0;
+	right: -20px;
+	transition: 0.5s;
+}
+  
+.animated-button:hover span {
+	padding-right: 25px;
+}
+  
+.animated-button:hover span:after {
+	opacity: 1;
+	right: 0;
+}
+
+/*End Animated Button Code */
+.center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+  }
