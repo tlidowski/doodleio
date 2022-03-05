@@ -8,6 +8,15 @@
 </head>
 <body>
 <img src="img/doodlio-transparent.png" alt="Doodl.io Logo" class="logo">
+<div style="text-align: right;">
+	<a href="login.html" id="loginsignup" class="button"><span>Log In</span></a>
+	<a href="" id="accountInfoButton" class="button" hidden><span>My Account</span></a>
+	<a href="" id="logOutButton" class="button" hidden onclick="signedIn(false)"><span>Sign Out</span></a>
+</div>
+<button id="loginsignupButton" class="button" onclick="signedIn(true)">Log In</button>
+
+
+
 
 <div class="about">
 	<h2>How to Play</h2>
@@ -23,14 +32,34 @@
 
 <div class="options center">
 	<div>
-		<button id="newGameButton" class="animated-button"><span>New Game</span></button>
+		<button id="newGameButton" class="button" disabled="true"><span>New Game</span></button>
 	</div>
 	<div>
-		<button id="joinGameButton" class="animated-button"><span>Join Game</span></button>
+		<button id="joinGameButton" class="button"><span>Join Game</span></button>
 	</div>
 </div>
 
-<script src="home.js"></script>
+<script src="home.js">
+
+
+function signedIn(isSignedIn) {
+	alert("Clicked")
+	/*let newGameButton = document.getElementById("newGameButton")
+	let joinGameButton = document.getElementById("joinGameButton")
+	let logInSignUpButton = document.getElementById("loginsignup")
+	let accountInfoButton = document.getElementById("accountInfoButton")
+	let logOutButton = document.getElementById("logOutButton")
+
+	let disabled = newGameButton.getAttribute("disabled")
+	let hidden = logOutButton.getAttribute("hidden")
+	if (isSignedIn) {
+		newGameButton.removeAttribute("disabled")
+		//joinGameButton.removeAttribute("disabled")
+		logInSignUpButton.setAttribute("hidden")
+		accountInfoButton.removeAttribute("hidden")
+	}*/
+}
+</script>
 
 </body>
 </html>
