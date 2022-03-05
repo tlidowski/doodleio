@@ -5,6 +5,12 @@
 	<title>Game Room</title>
 	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io();
+</script>
+
 <body>
 <img src="img/doodlio-transparent.png" alt="Doodl.io Logo" class="logo">
 
@@ -16,9 +22,12 @@
 	</table>
 	<table>
 		<tr>
-			<td id="drawing-board" class="drawingboard">
+			<td>
+				<canvas id="drawing-board" class="drawingboard">
 	
+				</canvas>	
 			</td>
+			
 			<td id="leader-board" class="leaderboard">
 	
 			</td>
