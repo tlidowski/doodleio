@@ -21,7 +21,75 @@ function pickAWord(wordList) {
 	return pickedWord
 }
 
-//Doodle Box
+/*
+	Doodle Box -- Sets up canvas and allows for drawing, drawings appear in real-time for other clients.
+	Drawing emit implemented from: https://github.com/wesbos/websocket-canvas-draw/blob/master/scripts.js
+*/
+
+let doodleBox = document.getElementById("drawing-board");
+let ctx = doodleBox.getContext("2d");
+
+let flag = false;
+let drawnf = false;
+let lastf;
+let lastSentf;
+
+let draw = function(xcor, ycor, drawnf) {
+	ctx.beginPath();
+
+	if(drawnf){
+	    ctx.lineCap = "round";
+	    ctx.moveTo(lastSentf.x, lastSentf.y)
+	    ctx.lineTo(xcor, ycor);
+	    ctx.lineWidth = 1;
+	    ctx.stroke();
+	}
+
+
+	lastSentf = {x: xcor, y: ycor};
+}
+
+
+socket.on('draw', function(data) {
+	return draw(data.xcor, data.ycor, data.drawnf);
+});
+
+// size of canvas
+doodleBox.width = 350;
+doodleBox.height = 400;
+
+
+doodleBox.addEventListener('mousedown',function(e) {
+    flag=true;
+});
+
+doodleBox.addEventListener('mouseup',function(e) {
+    flag=false;
+    drawnf=false;
+    socket.emit('drawnf', {drawnf: false});
+});
+
+doodleBox.addEventListener('mousemove',function(e) {
+    if(flag){
+	ctx.beginPath();
+	var xcor = e.offsetX;
+	var ycor = e.offsetY;
+	if(drawnf){
+	    ctx.lineCap = "round";
+	    ctx.moveTo(lastf.x, lastf.y)
+	    ctx.lineTo(xcor, ycor);
+	    ctx.lineWidth = 1;
+	    ctx.stroke();
+	}
+	lastf = {x: xcor, y: ycor};
+	
+	socket.emit('drawClick', {xcor: xcor, ycor:ycor, drawnf:drawnf});
+
+	drawnf = true;
+    }
+
+});
+
 
 //LeaderBoard Box
 
