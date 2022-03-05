@@ -12,14 +12,13 @@ if (userSignedIn) {
     newGameButton.disabled = "enabled";
     joinGameButton.disabled = "enabled";
 }
+newGameButton.onclick = function() { 
+    location.href = "localhost:3000/gameroom.html"
+}
 /*
 ADD YOUR CLIENT-SIDE CODE FOR add.html HERE
 */
 
-let titleInput = document.getElementById("title");
-let genreInput = document.getElementById("genre");
-let qualityCollection = document.getElementsByName("quality");
-let button = document.getElementById("submit");
 
 
 button.addEventListener("click", function() {
