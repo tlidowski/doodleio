@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Permanent+Marker" />
+<head>
+	<meta charset="utf-8">
+	<title>Doodl.io Log-On Screen</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<img src="img/doodlio-transparent.png" alt="Doodl.io Logo" class="logo">
+
+
+<div>
+	<div>
+		<label name="username" for="username">Username:</label>
+		<input type="text" id="username">
+	</div>
+	<div>
+		<label name="password" for="password">Password:</label>
+		<input type="password" id="password">
+	</div>
+</div>
+
+<button id="login">Log In</button>
+<button id="signup">New Account</button>
+
+<script>
+let usernameInput = document.getElementById("username");
+let passwordInput = document.getElementById("password");
+
+//Log-on Function
+document.getElementById("login").addEventListener("click", function () {
+	fetch("/auth", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({
+			username: usernameInput.value,
+			plaintextPassword: passwordInput.value,
+		})
+	}).then(function (response) {
+		if (response.status === 200) {
+			console.log("Success");
+		} else {
+			console.log("Failure");
+		}
+	});
+});
+
+//Sign-Up Function
+document.getElementById("signup").addEventListener("click", function () {
+	fetch("/user", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({
+			username: usernameInput.value,
+			plaintextPassword: passwordInput.value,
+		})
+	}).then(function (response) {
+		if (response.status === 200) {
+			console.log("Success");
+		} else {
+			console.log("Failure");
+		}
+	})
+});
+</script>
+
+</body>
+</html>

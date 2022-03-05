@@ -1,10 +1,13 @@
 const pg = require("pg");
+const bcrypt = require("bcrypt");
 const express = require("express");
 const app = express();
 
 const port = 3000;
 const hostname = "localhost";
 
+
+///Leftover from Bamazon; maybe remove soon
 const env = require("../env.json");
 const Pool = pg.Pool;
 const pool = new Pool(env);
@@ -27,90 +30,100 @@ app.get("/guess", function (req, res) { //Queries guess, user, canGuess
         //Don't allow a guess
     }
 });
-/* YOUR CODE HERE */
 
 
-/*
-let acceptableGenre = [
-    "scifi",
-    "romance",
-    "adventure"
-]
+//User Authentication
+app.post("/user", function (req, res) {
+    let username = req.body.username;
+    let plaintextPassword = req.body.plaintextPassword;
+    // TODO check body has username and plaintextPassword keys
+    // TODO check password length >= 5 and <= 36
+    // TODO check username length >= 1 and <= 20
 
-let acceptableQuality = [
-    "yes",
-    "no"
-]
-
-
-app.post("/add", function(req, res) {
-    let body = req.body
+    // TODO check if username already exists
     if (
-        !body.hasOwnProperty("title") ||
-        !body.hasOwnProperty("genre") ||
-        !body.hasOwnProperty("quality")
+        typeof username !== "string" ||
+        typeof plaintextPassword !== "string" ||
+        username.length < 1 ||
+        username.length > 20 ||
+        plaintextPassword.length < 5 ||
+        plaintextPassword.length > 36
     ) {
-        res.status(400)
-        res.send()
-        return
-    } else {
-        let title = body.title
-        let genre = body.genre
-        let quality = body.quality
-        if (
-            title.length > 15 || title.length < 1 ||
-            !acceptableGenre.includes(genre) ||
-            !acceptableQuality.includes(quality)
-        ) {
-            res.status(400)
-            res.send()
-            return
-        }
+        // username and/or password invalid
+        return res.status(401).send();
     }
 
-
-    //Insert Book
-    
-    pool.query(
-        `INSERT INTO books(title, genre, quality) 
-        VALUES($1, $2, $3)
-        RETURNING *`,
-        [body.title, body.genre, body.quality]
-    ).then(function (response) {
-        res.status(200)
-        res.send()
-    })
-    .catch(function (error) {
-        // something went wrong when inserting the row
-        res.status(500)
-        res.send()
-    });
-})
-
-app.get("/search", function (req, res) {
-    let { genre } = req.query;
-    if (Object.keys(genre).length === 0) { //Any Genre
-        pool.query("SELECT * FROM books")
+    pool.query("SELECT username FROM users WHERE username = $1", [username])
         .then(function (response) {
-            return res.json({ rows: response.rows });
+            if (response.rows.length !== 0) {
+                // username already exists
+                return res.status(401).send();
+            }
+            bcrypt
+                .hash(plaintextPassword, saltRounds)
+                .then(function (hashedPassword) {
+                    pool.query(
+                        "INSERT INTO users (username, hashed_password) VALUES ($1, $2)",
+                        [username, hashedPassword]
+                    )
+                        .then(function (response) {
+                            // account successfully created
+                            res.status(200).send();
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            res.status(500).send(); // server error
+                        });
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    res.status(500).send(); // server error
+                });
         })
         .catch(function (error) {
-            return res.status(500);
-        });
-    } else if (!acceptableGenre.includes(genre)) {
-        return res.status(400);
-    }
-    pool.query("SELECT * FROM books WHERE genre = $1", [genre])
-        .then(function (response) {
-            return res.json({ rows: response.rows });
-        })
-        .catch(function (error) {
-            return res.status(500);
+            console.log(error);
+            res.status(500).send(); // server error
         });
 });
+
+app.post("/auth", function (req, res) {
+    let username = req.body.username;
+    let plaintextPassword = req.body.plaintextPassword;
+    pool.query("SELECT hashed_password FROM users WHERE username = $1", [
+        username,
+    ])
+        .then(function (response) {
+            if (response.rows.length === 0) {
+                // username doesn't exist
+                return res.status(401).send();
+            }
+            let hashedPassword = response.rows[0].hashed_password;
+            bcrypt
+                .compare(plaintextPassword, hashedPassword)
+                .then(function (isSame) {
+                    if (isSame) {
+                        // password matched
+                        res.status(200).send();
+                    } else {
+                        // password didn't match
+                        res.status(401).send();
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    res.status(500).send(); // server error
+                });
+        })
+        .catch(function (error) {
+            console.log(error);
+            res.status(500).send(); // server error
+        });
+});
+
+
+
 
 app.listen(port, hostname, () => {
     console.log(`Listening at: http://${hostname}:${port}`);
 });
 
-*/

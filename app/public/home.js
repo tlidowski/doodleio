@@ -1,3 +1,17 @@
+const newGameButton = document.getElementById('newGameButton')
+const joinGameButton = document.getElementById('joinGameButton')
+const logInSignUpButton = document.getElementById('loginsignup')
+const accountInfoButton = document.getElementById('accountInfoButton')
+
+const userSignedIn = false; //default user is signed out
+
+if (userSignedIn) {
+    newGameButton.disabled = true;
+    joinGameButton.disabled = false;
+} else {
+    newGameButton.disabled = "enabled";
+    joinGameButton.disabled = "enabled";
+}
 /*
 ADD YOUR CLIENT-SIDE CODE FOR add.html HERE
 */
@@ -33,4 +47,5 @@ button.addEventListener("click", function() {
         }
 	})
 });
+
 
