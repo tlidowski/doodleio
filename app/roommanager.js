@@ -44,7 +44,14 @@ function joinRoom(id, username, roomNum) {
     }
 }
 
-function leaveRoom(id) {}
+function leaveRoom(id) {
+    for (let user of users) {
+        if (user.id === id) {
+            console.log("deleted user " + user);
+            users.splice(users.findIndex(user), 1);
+        }
+    }
+}
 
 module.exports = {
     createRoom,
