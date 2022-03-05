@@ -1,19 +1,47 @@
-const pg = require("pg");
-const express = require("express");
-const app = express();
-
 const port = 3000;
 const hostname = "localhost";
 
+const pg = require("pg");
 const env = require("../env.json");
 const Pool = pg.Pool;
 const pool = new Pool(env);
-pool.connect().then(function () {
+
+const express = require("express");
+const app = express();
+const http = require('http');
+const server = http.createServer(app);
+
+const {Server} = require("socket.io");
+const io = new Server(server);
+
+/*pool.connect().then(function () {
     //console.log(`Connected to database ${env.database}`);
-});
+});*/
 
 app.use(express.static("public"));
 app.use(express.json());
+
+server.listen(port, hostname, () => {
+    console.log(`Listening at: http://${hostname}:${port}`);
+});
+
+/* 
+    Websocket Code -- Drawing emit to other clients implemented from:
+    https://github.com/wesbos/websocket-canvas-draw/blob/master/server.js
+*/
+
+io.on('connection', function(socket) {
+	console.log('a user connected');
+
+	socket.on('disconnect', () => {
+		console.log('user disconnected');
+	});
+
+	socket.on('drawClick', function(data) {
+		socket.broadcast.emit('draw', {xcor: data.xcor, ycor: data.ycor, drawnf: data.drawnf});
+	});
+
+});
 
 
 app.get("/guess", function (req, res) { //Queries guess, user, canGuess
