@@ -9,14 +9,23 @@
 <body>
 <img src="img/doodlio-transparent.png" alt="Doodl.io Logo" class="logo">
 <div style="text-align: right;">
-	<a href="login.html" id="loginsignup" class="button"><span>Log In</span></a>
-	<a href="" id="accountInfoButton" class="button" hidden><span>My Account</span></a>
-	<a href="" id="logOutButton" class="button" hidden onclick="signedIn(false)"><span>Sign Out</span></a>
+	<a href="./accountinfo.html" id="accountInfoButton" class="button" hidden>Account</a>
+	<button id="signOut" hidden="hidden" class="button">Sign Out</button>
 </div>
-<button id="loginsignupButton" class="button" onclick="signedIn(true)">Log In</button>
 
+<div id="inputBox" class="logininfo">
+	<div>
+		<label name="username" for="username">Username:</label>
+		<input type="text" id="username">
+	</div>
+	<div>
+		<label name="password" for="password">Password:</label>
+		<input type="password" id="password">
+	</div>
+</div>
 
-
+<a class="button" id="logIn">Log In</a>
+<a class="button" id="signUp">Sign Up</a>
 
 <div class="about">
 	<h2>How to Play</h2>
@@ -32,33 +41,15 @@
 
 <div class="options center">
 	<div>
-		<button id="newGameButton" class="button" disabled="true"><span>New Game</span></button>
+		<button id="newGameButton" class="button" disabled>New Game</button>
 	</div>
 	<div>
-		<button id="joinGameButton" class="button"><span>Join Game</span></button>
+		<button id="joinGameButton" class="button" disabled>Join Game</button>
 	</div>
 </div>
 
 <script src="home.js">
 
-
-function signedIn(isSignedIn) {
-	alert("Clicked")
-	/*let newGameButton = document.getElementById("newGameButton")
-	let joinGameButton = document.getElementById("joinGameButton")
-	let logInSignUpButton = document.getElementById("loginsignup")
-	let accountInfoButton = document.getElementById("accountInfoButton")
-	let logOutButton = document.getElementById("logOutButton")
-
-	let disabled = newGameButton.getAttribute("disabled")
-	let hidden = logOutButton.getAttribute("hidden")
-	if (isSignedIn) {
-		newGameButton.removeAttribute("disabled")
-		//joinGameButton.removeAttribute("disabled")
-		logInSignUpButton.setAttribute("hidden")
-		accountInfoButton.removeAttribute("hidden")
-	}*/
-}
 </script>
 
 </body>

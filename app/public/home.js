@@ -1,4 +1,4 @@
-const newGameButton = document.getElementById('newGameButton')
+/*const newGameButton = document.getElementById('newGameButton')
 const joinGameButton = document.getElementById('joinGameButton')
 const logInSignUpButton = document.getElementById('loginsignup')
 const accountInfoButton = document.getElementById('accountInfoButton')
@@ -15,36 +15,94 @@ if (userSignedIn) {
 newGameButton.onclick = function() { 
     location.href = "localhost:3000/gameroom.html"
 }
-/*
+
 ADD YOUR CLIENT-SIDE CODE FOR add.html HERE
 */
 
 
-
-button.addEventListener("click", function() {
-	let titleChoice = titleInput.value
-	// TODO print other fields
-	let genreChoice = genreInput.value
-    for (let option of qualityCollection) {
-        if (option.checked) {
-            var qualityChoice = option.value
-        }
-    }
-	let data = {title: titleChoice, genre: genreChoice, quality: qualityChoice}
-	fetch('/add', {
-        method: 'POST', // or 'PUT'
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-     }).then(function (response) {
-		let textBox = document.getElementById("message")
-        if (response.status == 200) {
-            textBox.textContent = "Success" // will be 400 if request failed
-        } else {
-            textBox.textContent = "Bad Request"
-        }
+let isSignedIn = false
+let usernameInput = document.getElementById("username");
+let passwordInput = document.getElementById("password");
+document.getElementById("logIn").addEventListener("click", function () {
+	fetch("/auth", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({
+			username: usernameInput.value,
+			plaintextPassword: passwordInput.value,
+		})
+	}).then(function (response) {
+		if (response.status === 200) {
+			console.log("Successful Login");
+			alert("You're In!")
+			isSignedIn = true
+			accountStatus(isSignedIn)
+		} else {
+			console.log("Failed Login");
+			alert("Something went wrong...")
+		}
+	});
+});
+document.getElementById("signUp").addEventListener("click", function () {
+	alert("CLICK")
+	console.log("CLICKED")
+	fetch("/user", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({
+			username: usernameInput.value,
+			plaintextPassword: passwordInput.value,
+		})
+	}).then(function (response) {
+		if (response.status === 200) {
+			alert("Account Created Successfully.")
+			alert("Signing You In...") ///To-do: Hook Up Login Auto
+			console.log("Successful New Account");
+			
+		} else if (response.status === 401) {
+			alert("Account Name Taken")
+			console.log("Failed New Account");
+		} else {
+			console.log("Failed New Account");
+		}
 	})
 });
+document.getElementById("signOut").addEventListener("click", function() {
+	let isSignedIn = false
+	accountStatus(isSignedIn)
+})
 
+function accountStatus(signInStatus) {
+	alert(`Changing Account Status to ${signInStatus}`)
+	let inputBox = document.getElementById("inputBox")
+	let logInButton = document.getElementById("logIn")
+	let signUpButton = document.getElementById("signUp")
+	let signOutButton = document.getElementById("signOut")
+	let accountInfoButton = document.getElementById("accountInfoButton")
+	let newGameButton = document.getElementById("newGameButton")
+	let joinGameButton = document.getElementById("joinGameButton")
+	if (signInStatus) { //User Has Logged In
+		console.log("Logging In")
+		inputBox.setAttribute("hidden", "hidden")
+		logInButton.setAttribute("hidden", "hidden")
+		signUpButton.setAttribute("hidden", "hidden")
+		signOutButton.removeAttribute("hidden")
+		accountInfoButton.removeAttribute("hidden")
+		newGameButton.removeAttribute("disabled")
+		joinGameButton.removeAttribute("disabled")
+	} else {
+		console.log("Logging Out")
+		inputBox.removeAttribute("hidden")
+		logInButton.removeAttribute("hidden")
+		signUpButton.removeAttribute("hidden")
+		signOutButton.setAttribute("hidden", "hidden")
+		accountInfoButton.setAttribute("hidden", "hidden")
+		newGameButton.setAttribute("disabled", "disabled")
+		joinGameButton.setAttribute("disabled", "disabled")
+	}
+}
 

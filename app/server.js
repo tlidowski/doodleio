@@ -1,28 +1,31 @@
 const pg = require("pg");
 const bcrypt = require("bcrypt");
-const express = require("express");
-const app = express();
 
 const port = 3000;
 const hostname = "localhost";
 
 
-///Leftover from Bamazon; maybe remove soon
-const env = require("../env.json");
-const Pool = pg.Pool;
-const pool = new Pool(env);
-
+//For Doodle Board
 const express = require("express");
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
-
 const {Server} = require("socket.io");
 const io = new Server(server);
 
 /*pool.connect().then(function () {
     //console.log(`Connected to database ${env.database}`);
 });*/
+
+//Taken From Login/Create Exercise
+const saltRounds = 10;
+const env = require("../env.json");
+const Pool = pg.Pool;
+const pool = new Pool(env);
+pool.connect().then(function () {
+    console.log(`Connected to database ${env.database}`);
+});
+
 
 app.use(express.static("public"));
 app.use(express.json());
@@ -36,6 +39,7 @@ server.listen(port, hostname, () => {
     https://github.com/wesbos/websocket-canvas-draw/blob/master/server.js
 */
 
+//For Doodle Board
 io.on('connection', function(socket) {
 	console.log('a user connected');
 
@@ -118,6 +122,7 @@ app.post("/user", function (req, res) {
 });
 
 app.post("/auth", function (req, res) {
+    console.log("Attempting...")
     let username = req.body.username;
     let plaintextPassword = req.body.plaintextPassword;
     pool.query("SELECT hashed_password FROM users WHERE username = $1", [
@@ -125,6 +130,7 @@ app.post("/auth", function (req, res) {
     ])
         .then(function (response) {
             if (response.rows.length === 0) {
+                console.log("User not found")
                 // username doesn't exist
                 return res.status(401).send();
             }
@@ -137,6 +143,7 @@ app.post("/auth", function (req, res) {
                         res.status(200).send();
                     } else {
                         // password didn't match
+                        console.log("Incorrect Password")
                         res.status(401).send();
                     }
                 })
@@ -149,12 +156,5 @@ app.post("/auth", function (req, res) {
             console.log(error);
             res.status(500).send(); // server error
         });
-});
-
-
-
-
-app.listen(port, hostname, () => {
-    console.log(`Listening at: http://${hostname}:${port}`);
 });
 

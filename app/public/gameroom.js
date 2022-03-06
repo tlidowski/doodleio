@@ -1,19 +1,41 @@
 
-var easyWords = [ //Put into .txt and import
+var easyWords = [ //Put into .txt and import? Or from Database
 	"dog",
 	"cat",
 	"elephant",
 	"happy"
 ]
+//Current Default; Change When Artist Characteristic is Accessible
+let isArtist = false
 
 //Word Box
-let wordBox = document.getElementById("word-space")
+let wordBox = document.getElementById("underscore-space")
 
 let newWordButton = document.getElementById("newWordButton")
 
 newWordButton.addEventListener("click", function() {
-	wordBox.textContent = pickAWord(easyWords)
+	clearWordSpace()
+	chosenWord = pickAWord(easyWords)
+	console.log(chosenWord)
+	letterList = chosenWord.split('')
+	console.log(letterList)
+	for (letterIndex in letterList) {
+		box = document.createElement("td")
+		box.classList.add("blankLetter")
+		if (isArtist) {
+			//ShowWord
+			box.textContent = letterList[letterIndex]
+		} else {
+			box.textContent = "_"
+		}		
+		wordBox.append(box)	
+	}
+	
 })
+
+function clearWordSpace() {
+	wordBox.innerHTML = ""
+}
 
 function pickAWord(wordList) {
 	let numWords = wordList.length
