@@ -12,6 +12,7 @@ function createRoom(roomNum, numPlayers) {
     const room = {
         roomNum: newestRoom,
         game_occ: false,
+        roomActive: true,
         numPlayers: numPlayers,
     };
 
@@ -30,12 +31,14 @@ function startRoom(roomNum) {
     }
 }
 
+/// username: ____ room code: ________ -> url?=roomcode="1234"
+
 function joinRoom(id, username, roomNum) {
     const user = { id, username, roomNum };
 
     for (let room of rooms) {
         if (room.roomNum === roomNum) {
-            if (room.game_occ) {
+            if (!room.game_occ) {
                 users.push(user);
             } else {
                 console.log("game already started");
