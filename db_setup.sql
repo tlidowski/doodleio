@@ -26,4 +26,5 @@ CREATE TABLE users(
     numWon INT, 
     highScore INT, 
     totalPoints INT, 
-    foreign key (roomID) references room(roomID));
+    roomID VARCHAR(16),
+    foreign key (roomID) references rooms(roomID));
