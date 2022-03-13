@@ -47,14 +47,19 @@ io.on("connection", function (socket) {
 
     socket.on("disconnect", () => {
         console.log("user disconnected");
+        for (let i = 0; i < userRoomsLocalStorage.length; i++) {
+            let user = userRoomsLocalStorage[i];
+            if (user.id === socket.id) {
+                console.log("deleted user " + user);
+                userRoomsLocalStorage.splice(i, 1);
+            }
+        }
     });
 
     socket.on("drawClick", function (data) {
         // from https://github.com/bradtraversy/chatcord
 
         user = userRoomsLocalStorage.find((user) => user.id === socket.id);
-
-        console.log(user.roomNum);
 
         socket.broadcast.to(user.roomNum).emit("draw", {
             xcor: data.xcor,
@@ -74,7 +79,7 @@ io.on("connection", function (socket) {
 
         socket.join(user.roomNum);
 
-        console.log("joined " + user.roomNum);
+        console.log(user.username + "joined " + user.roomNum);
     });
 });
 
