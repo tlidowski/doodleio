@@ -1,5 +1,5 @@
 //set up artist space
-let flag=false;
+let flag = false;
 let drawnf = false;
 let lastf;
 let strokeColor;
@@ -59,6 +59,8 @@ let lastSentf;
 // Gameflow globals
 let playingUsers = {}; //object that holds username:points pairs.
 let roundNumber;
+
+socket.emit("joinRoom", { username: "kyle", roomNum: "A" });
 
 function countDown() {
     timerBox.textContent = `Time Remaining: ${seconds}`;

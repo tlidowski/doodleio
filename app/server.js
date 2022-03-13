@@ -39,6 +39,8 @@ server.listen(port, hostname, () => {
     https://github.com/wesbos/websocket-canvas-draw/blob/master/server.js
 */
 
+userRoomsLocalStorage = [];
+
 //For Doodle Board
 io.on("connection", function (socket) {
     console.log("a user connected");
@@ -48,7 +50,13 @@ io.on("connection", function (socket) {
     });
 
     socket.on("drawClick", function (data) {
-        socket.broadcast.emit("draw", {
+        // from https://github.com/bradtraversy/chatcord
+
+        user = userRoomsLocalStorage.find((user) => user.id === socket.id);
+
+        console.log(user.roomNum);
+
+        socket.broadcast.to(user.roomNum).emit("draw", {
             xcor: data.xcor,
             ycor: data.ycor,
             drawnf: data.drawnf,
@@ -62,17 +70,11 @@ io.on("connection", function (socket) {
         const user = joinRoom(socket.id, username, roomNum);
         //pool.query('UPDATE users SET roomID = $1 where username = $2', [user.roomNum, user.username]);
 
+        userRoomsLocalStorage.push({ roomNum: roomNum, id: socket.id });
+
         socket.join(user.roomNum);
 
         console.log("joined " + user.roomNum);
-    });
-
-    socket.on("drawClick", function (data) {
-        socket.broadcast.emit("draw", {
-            xcor: data.xcor,
-            ycor: data.ycor,
-            drawnf: data.drawnf,
-        });
     });
 });
 
@@ -147,9 +149,7 @@ app.post("/auth", function (req, res) {
     console.log("Attempting...");
     let username = req.body.username;
     let plaintextPassword = req.body.plaintextPassword;
-    pool.query("SELECT userPass FROM users WHERE username = $1", [
-        username,
-    ])
+    pool.query("SELECT userPass FROM users WHERE username = $1", [username])
         .then(function (response) {
             if (response.rows.length === 0) {
                 console.log("User not found");
