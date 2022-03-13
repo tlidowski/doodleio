@@ -20,6 +20,10 @@
 			<td id="word-space" class = "wordspace">
 				<div id="underscore-space" style="text-align: center;"></div>
 			</td>
+			<td id="timer-space" class="timerspace">
+				Time Remaining: XX
+			</td>
+
 		</tr>
 	</table>
 	<table>
@@ -35,10 +39,46 @@
 			</td>
 		</tr>
 	</table>
+	<table style="background-color:black">
+		<tr id="styleRow">
+	  <td>
+		<div class="box" id="currentColor"></div>
+	  </td>
+	  <td>
+	  </td>
+	  <td>
+		<table>
+		  <tr id="firstColorRow">
+			
+		  </tr>
+		  <tr id="secondColorRow">
+			
+		  </tr>
+		</table>
+	  </td>
+	  <td >
+		<div id="pencil">
+		  <img style="height:40px;width:25px;" src="img/pencil-cursor.png"></img>
+		</div>
+	  </td>
+	  <td>
+		<div id="eraser">
+		  <img style="height:40px;width:25px;" src="img/eraser-cursor.png"></img>
+		</div>
+	  </td>
+	  <td>
+		<div id="fill">
+		  <img style="height:40px;width:25px;" src="img/fill-cursor.png"></img>
+		</div>
+	  </td>
+		</tr>
+		
+	  </table>
 	<table>
 		<tr>
 			<td id="guess-space" class="guessspace">
-
+				<label name="wordguess" for="wordguess">Your Guess:</label>
+				<input type="text" id="wordguess">
 			</td>
 		</tr>
 	</table>
@@ -46,7 +86,11 @@
 
 <button id= "newWordButton" class="button">New Word</button>
 
-<script src="gameroom.js"></script>
+<script src="gameroom.js">
+</script>
+<script>
+	setup();
+</script>
 
 </body>
 </html>

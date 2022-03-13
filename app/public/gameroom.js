@@ -1,4 +1,52 @@
+//set up artist space
+var flag=false;
+var drawnf=false;
+var lastf;
+var strokeColor;
+var strokeSize;
+var fill= document.getElementById("fill");
+var pencil =  document.getElementById("pencil");
+var eraser= document.getElementById("eraser");
+var colors = ["#ff1616", "#ff914d", "#ffde59",
+	      "#c9e265", "#7ed957", "#008037", "#5ce1e6", "#38b6ff","#5271ff",
+	      "#8c52ff", "#ffc6c4", "#000000","#492b16",
+	      "#737373"]
 
+function setup(){
+    var currentColor= document.getElementById("currentColor");
+    var styleRow =  document.getElementById("styleRow");
+    currentColor.style.height="50px";
+    currentColor.style.width="50px";
+    for(let color=0; color<colors.length; color++){
+	let row = color<colors.length/2? document.getElementById("firstColorRow"):document.getElementById("secondColorRow");
+	let col = document.createElement("td");
+	let colorButton= document.createElement("div");
+	colorButton.classList.add("box");
+	colorButton.style.backgroundColor= colors[color];
+	colorButton.addEventListener('click',function(e) {
+	    currentColor.style.backgroundColor = this.style.backgroundColor;
+	    strokeColor = this.style.backgroundColor;
+	});
+	col.append(colorButton);
+	row.append(col);
+    }
+    for(let size=1; size<=4; size++){
+	var col =  document.createElement("td");
+	var element =  document.createElement("div");
+	element.classList.add("box");
+	element.style.borderRadius= "50%";
+	element.style.backgroundColor= "black";
+	element.style.width = size*10 + "px";
+	element.style.height = size*10+"px";
+	element.addEventListener('click',function(e) {
+	    strokeSize=Number(this.style.height.slice(0,2))/2;
+	});
+	col.append(element);
+	styleRow.append(col);
+    }
+}
+//
+let testSpeed = 1000 //Keep default at 1000 for timer
 var easyWords = [ //Put into .txt and import? Or from Database
 	"dog",
 	"cat",
@@ -26,7 +74,7 @@ newWordButton.addEventListener("click", function() {
 			//ShowWord
 			box.textContent = letterList[letterIndex]
 		} else {
-			box.textContent = "_"
+			box.textContent = "_" //change: create a function to reveal a random character at 30, 10 seconds
 		}		
 		wordBox.append(box)	
 	}
@@ -37,11 +85,35 @@ function clearWordSpace() {
 	wordBox.innerHTML = ""
 }
 
-function pickAWord(wordList) {
+function pickAWord(wordList) { //To be changed to connect to database
 	let numWords = wordList.length
 	let pickedWord = wordList[Math.floor(Math.random()*numWords)]
 	return pickedWord
 }
+
+//Guess Box
+let guess
+
+//Timer
+let timerBox = document.getElementById("timer-space")
+let seconds = 60
+function countDown() {
+	timerBox.textContent = `Time Remaining: ${seconds}`
+	if (seconds > 0){
+		seconds--
+	} else {
+		turnInProgress = false
+	}
+}
+
+let turnInProgress = true
+let intervalId = null
+let turnStarted = false
+
+checkTurnStatus()
+setInterval(checkTurnStatus, 1000)
+
+
 
 /*
 	Doodle Box -- Sets up canvas and allows for drawing, drawings appear in real-time for other clients.
@@ -114,62 +186,3 @@ doodleBox.addEventListener('mousemove',function(e) {
 
 
 //LeaderBoard Box
-
-//Guess Box
-
-
-/*
-let dropdown = document.getElementById("genre");
-let table = document.getElementById("books");
-let button = document.getElementById("submit");
-
-function removeChildren(element) {
-	while (element.hasChildNodes()) {
-		element.lastChild.remove();
-	}
-}
-
-button.addEventListener("click", function() {
-	let dropdown = document.getElementById("genre");
-	let table = document.getElementById("books");
-	let genre = dropdown.value;
-	fetch(`/search?genre=${genre}`).then(function (response) {
-		if (response.status === 200) {
-			return response.json();
-		} else {
-			return response.status;
-		}
-	}).then(function (response) {
-		removeChildren(table);
-		let message = document.getElementById("message");
-		if (response.rows.length === 0) { //No books
-			message.textContent = "No books found"
-		} else { //Books
-			message.textContent = ""
-			for (let row of response.rows) {
-				let tableRow = document.createElement("tr");
-				let keyIndex = 0;
-				for (let key of ["title", "genre", "quality"]) {
-					let cell = document.createElement("td");
-					if (keyIndex == 2) {
-						let quality = row[key]
-						if (quality) {
-							cell.textContent = "Yes";
-						} else {
-							cell.textContent = "No";
-						}
-					} else {
-						cell.textContent = row[key];
-					}
-					keyIndex++
-					tableRow.append(cell);
-				}
-				table.append(tableRow);
-			}
-		}
-	}).catch(function (error) {
-		console.log(error);
-	});
-
-});
-*/
