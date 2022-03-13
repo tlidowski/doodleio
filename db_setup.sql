@@ -11,7 +11,7 @@ INSERT INTO words (word, difficulty) VALUES ('aftermath', 'expert'), ('chaos', '
 
 -- table for rooms
 CREATE TABLE rooms(
-    roomID VARCHAR(16) PRIMARY KEY, 
+    roomID VARCHAR(64) PRIMARY KEY, 
     isAvailable BOOLEAN, 
     isPlaying BOOLEAN, 
     numPlayers INT,
@@ -26,11 +26,11 @@ INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, current
 
 -- table for list of users
 CREATE TABLE users(
-    username VARCHAR(32) PRIMARY KEY,
-    userPass VARCHAR(32), 
+    username VARCHAR(256) PRIMARY KEY,
+    userPass VARCHAR(256), 
     numGames INT, 
     numWon INT, 
     highScore INT, 
     totalPoints INT, 
-    roomID VARCHAR(16),
+    roomID VARCHAR(64),
     foreign key (roomID) references rooms(roomID));
