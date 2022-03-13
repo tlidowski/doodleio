@@ -1,8 +1,10 @@
 # doodleio
 
 ### Setting Up the Database
-psql --username postgres
-CREATE DATABASE doodlio;
+```psql --username postgres```
 
-\c doodlio
-\i [path to sql file]
+```CREATE DATABASE doodleio;```
+
+```\c doodlio```
+
+```\i [path to sql file]```

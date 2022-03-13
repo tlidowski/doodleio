@@ -127,8 +127,8 @@ app.post("/user", function (req, res) {
                 .hash(plaintextPassword, saltRounds)
                 .then(function (hashedPassword) {
                     pool.query(
-                        "INSERT INTO users (username, userPass) VALUES ($1, $2)",
-                        [username, hashedPassword]
+                        "INSERT INTO users (username, userPass, numGames, numWon, highScore, totalPoints) VALUES ($1, $2, $3, $4, $5, $6)",
+                        [username, hashedPassword, 0, 0, 0, 0]
                     )
                         .then(function (response) {
                             // account successfully created
