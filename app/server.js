@@ -120,7 +120,7 @@ app.post("/user", function (req, res) {
                 .hash(plaintextPassword, saltRounds)
                 .then(function (hashedPassword) {
                     pool.query(
-                        "INSERT INTO users (username, hashed_password) VALUES ($1, $2)",
+                        "INSERT INTO users (username, userPass) VALUES ($1, $2)",
                         [username, hashedPassword]
                     )
                         .then(function (response) {
@@ -147,7 +147,7 @@ app.post("/auth", function (req, res) {
     console.log("Attempting...");
     let username = req.body.username;
     let plaintextPassword = req.body.plaintextPassword;
-    pool.query("SELECT hashed_password FROM users WHERE username = $1", [
+    pool.query("SELECT userPass FROM users WHERE username = $1", [
         username,
     ])
         .then(function (response) {
@@ -156,7 +156,7 @@ app.post("/auth", function (req, res) {
                 // username doesn't exist
                 return res.status(401).send();
             }
-            let hashedPassword = response.rows[0].hashed_password;
+            let hashedPassword = response.rows[0].userPass;
             bcrypt
                 .compare(plaintextPassword, hashedPassword)
                 .then(function (isSame) {
