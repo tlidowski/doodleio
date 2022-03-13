@@ -1,5 +1,4 @@
-//set up artist space
-var flag=false;
+//set up artist spaceletr flag=false;
 var drawnf=false;
 var lastf;
 var strokeColor;
@@ -149,7 +148,7 @@ function pickAWord(wordList) { //To be changed to connect to database
 
 
 
-let draw = function(xcor, ycor, drawnf) {
+let draw = function(xcor, ycor, drawnf, strokeSize, strokeColor) {
 
 	ctx.beginPath();
 
@@ -157,7 +156,8 @@ let draw = function(xcor, ycor, drawnf) {
 	    ctx.lineCap = "round";
 	    ctx.moveTo(lastSentf.x, lastSentf.y)
 	    ctx.lineTo(xcor, ycor);
-	    ctx.lineWidth = 1;
+	    ctx.lineWidth = strokeSize;
+	    ctx.strokeStyle = strokeColor;
 	    ctx.stroke();
 	}
 	lastSentf = {x: xcor, y: ycor};
@@ -166,7 +166,7 @@ let draw = function(xcor, ycor, drawnf) {
 
 socket.on('draw', function(data) {
 	
-	return draw(data.xcor, data.ycor, data.drawnf);
+	return draw(data.xcor, data.ycor, data.drawnf, data.strokeSize, data.strokeColor);
 });
 
 // size of canvas
@@ -196,19 +196,19 @@ eraser.addEventListener('mousedown',function(e) {
 doodleBox.addEventListener('mousemove',function(e) {
     if(flag){
 	ctx.beginPath();
-	var xcor = e.offsetX;
-	var ycor = e.offsetY;
+	let xcor = e.offsetX;
+	let ycor = e.offsetY;
 	if(drawnf){
 	    ctx.lineCap = "round";
 	    ctx.moveTo(lastf.x, lastf.y)
 	    ctx.lineTo(xcor, ycor);
-	    ctx.lineWidth = 1;
+		ctx.lineWidth = strokeSize;
 	    ctx.strokeStyle = strokeColor;
 	    ctx.stroke();
 	}
 	lastf = {x: xcor, y: ycor};
 	
-	socket.emit('drawClick', {xcor: xcor, ycor:ycor, drawnf:drawnf});
+	socket.emit('drawClick', {xcor: xcor, ycor:ycor, drawnf:drawnf, strokeSize:strokeSize, strokeColor:strokeColor});
 
 	drawnf = true;
     }

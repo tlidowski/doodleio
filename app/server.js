@@ -48,7 +48,7 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('drawClick', function(data) {
-		socket.broadcast.emit('draw', {xcor: data.xcor, ycor: data.ycor, drawnf: data.drawnf});
+		socket.broadcast.emit('draw', {xcor: data.xcor, ycor: data.ycor, drawnf: data.drawnf, strokeSize:data.strokeSize, strokeColor:data.strokeColor});
 	});
 
 });
