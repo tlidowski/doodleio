@@ -1,4 +1,5 @@
-//set up artist spaceletr flag=false;
+//set up artist space
+let flag=false;
 let drawnf = false;
 let lastf;
 let strokeColor;
@@ -44,6 +45,10 @@ let guess;
 //Timer
 let timerBox = document.getElementById("timer-space");
 let seconds = 60;
+
+let turnInProgress = true;
+let intervalId = null;
+let turnStarted = false;
 
 //Drawing Box
 let doodleBox = document.getElementById("drawing-board");
@@ -120,10 +125,6 @@ function setup() {
 	Doodle Box -- Sets up canvas and allows for drawing, drawings appear in real-time for other clients.
 	Drawing emit implemented from: https://github.com/wesbos/websocket-canvas-draw/blob/master/scripts.js
 */
-
-let draw = function (xcor, ycor, drawnf) {
-    lastSentf = { x: xcor, y: ycor };
-};
 
 let draw = function (xcor, ycor, drawnf, strokeSize, strokeColor) {
     ctx.beginPath();
