@@ -45,6 +45,8 @@ function joinRoom(id, username, roomNum) {
             }
         }
     }
+
+    return user;
 }
 
 function leaveRoom(id) {
