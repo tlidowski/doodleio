@@ -1,22 +1,23 @@
 //set up artist spaceletr flag=false;
-var drawnf=false;
-var lastf;
-var strokeColor;
-var strokeSize;
-var fill= document.getElementById("fill");
-var pencil =  document.getElementById("pencil");
-var eraser= document.getElementById("eraser");
-var colors = ["#ff1616", "#ff914d", "#ffde59",
+let drawnf=false;
+let lastf;
+let strokeColor;
+let strokeSize;
+let fill= document.getElementById("fill");
+let pencil =  document.getElementById("pencil");
+let eraser= document.getElementById("eraser");
+let colors = ["#ff1616", "#ff914d", "#ffde59",
 	      "#c9e265", "#7ed957", "#008037", "#5ce1e6", "#38b6ff","#5271ff",
 	      "#8c52ff", "#ffc6c4", "#000000","#492b16",
 	      "#737373"]
 let testSpeed = 1000 //Keep default at 1000 for timer
-var easyWords = [ //Put into .txt and import? Or from Database
+let easyWords = [ //Put into .txt and import? Or from Database
 	"dog",
 	"cat",
 	"elephant",
 	"happy"
 ]
+
 //Current Default; Change When Artist Characteristic is Accessible
 let isArtist = false
 
@@ -35,7 +36,15 @@ let turnInProgress = true
 let intervalId = null
 let turnStarted = false
 
+//Drawing Box
+let doodleBox = document.getElementById("drawing-board");
+let ctx = doodleBox.getContext("2d");
 
+let lastSentf;
+
+// Gameflow globals
+let playingUsers = {}; //object that holds username:points pairs.
+let roundNumber;
 
 function countDown() {
 	timerBox.textContent = `Time Remaining: ${seconds}`
@@ -61,17 +70,11 @@ function checkTurnStatus() {
 checkTurnStatus()
 setInterval(checkTurnStatus, 1000)
 
-//doodle stuff
-
-
-let doodleBox = document.getElementById("drawing-board");
-let ctx = doodleBox.getContext("2d");
-
-let lastSentf;
+//Canvas set up
 
 function setup(){
-    var currentColor= document.getElementById("currentColor");
-    var styleRow =  document.getElementById("styleRow");
+    let currentColor= document.getElementById("currentColor");
+    let styleRow =  document.getElementById("styleRow");
     currentColor.style.height="50px";
     currentColor.style.width="50px";
     for(let color=0; color<colors.length; color++){
@@ -88,8 +91,8 @@ function setup(){
 	row.append(col);
     }
     for(let size=1; size<=4; size++){
-	var col =  document.createElement("td");
-	var element =  document.createElement("div");
+	let col =  document.createElement("td");
+	let element =  document.createElement("div");
 	element.classList.add("box");
 	element.style.borderRadius= "50%";
 	element.style.backgroundColor= "black";
@@ -102,44 +105,6 @@ function setup(){
 	styleRow.append(col);
     }
 }
-
-//Generate Word Space
-
-newWordButton.addEventListener("click", function() {
-	clearWordSpace()
-	chosenWord = pickAWord(easyWords)
-	console.log(chosenWord)
-	letterList = chosenWord.split('')
-	console.log(letterList)
-	for (letterIndex in letterList) {
-		box = document.createElement("td")
-		box.classList.add("blankLetter")
-		if (isArtist) {
-			//ShowWord
-			box.textContent = letterList[letterIndex]
-		} else {
-			box.textContent = "_" //change: create a function to reveal a random character at 30, 10 seconds
-		}		
-		wordBox.append(box)	
-	}
-	
-})
-
-function clearWordSpace() {
-	wordBox.innerHTML = ""
-}
-
-function pickAWord(wordList) { //To be changed to connect to database
-	let numWords = wordList.length
-	let pickedWord = wordList[Math.floor(Math.random()*numWords)]
-	return pickedWord
-}
-
-
-
-
-
-
 
 /*
 	Doodle Box -- Sets up canvas and allows for drawing, drawings appear in real-time for other clients.
@@ -215,5 +180,38 @@ doodleBox.addEventListener('mousemove',function(e) {
 
 });
 
+//Generate Word Space
+
+newWordButton.addEventListener("click", function() {
+	clearWordSpace()
+	chosenWord = pickAWord(easyWords)
+	console.log(chosenWord)
+	letterList = chosenWord.split('')
+	console.log(letterList)
+	for (letterIndex in letterList) {
+		box = document.createElement("td")
+		box.classList.add("blankLetter")
+		if (isArtist) {
+			//ShowWord
+			box.textContent = letterList[letterIndex]
+		} else {
+			box.textContent = "_" //change: create a function to reveal a random character at 30, 10 seconds
+		}		
+		wordBox.append(box)	
+	}
+	
+})
+
+function clearWordSpace() {
+	wordBox.innerHTML = ""
+}
+
+function pickAWord(wordList) { //To be changed to connect to database
+	let numWords = wordList.length
+	let pickedWord = wordList[Math.floor(Math.random()*numWords)]
+	return pickedWord
+}
 
 //LeaderBoard Box
+
+// Gameflow!
