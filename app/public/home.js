@@ -92,8 +92,8 @@ function accountStatus(signInStatus) {
 		signUpButton.setAttribute("hidden", "hidden")
 		signOutButton.removeAttribute("hidden")
 		accountInfoButton.removeAttribute("hidden")
-		newGameButton.removeAttribute("disabled")
-		joinGameButton.removeAttribute("disabled")
+		newGameButton.classList.replace('button-disabled', 'button')
+		joinGameButton.classList.replace('button-disabled', 'button')
 	} else {
 		console.log("Logging Out")
 		inputBox.removeAttribute("hidden")
@@ -101,8 +101,8 @@ function accountStatus(signInStatus) {
 		signUpButton.removeAttribute("hidden")
 		signOutButton.setAttribute("hidden", "hidden")
 		accountInfoButton.setAttribute("hidden", "hidden")
-		newGameButton.setAttribute("disabled", "disabled")
-		joinGameButton.setAttribute("disabled", "disabled")
+		newGameButton.classList.replace('button', 'button-disabled')
+		joinGameButton.classList.replace('button', 'button-disabled')
 	}
 }
 

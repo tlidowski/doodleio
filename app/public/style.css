@@ -143,14 +143,20 @@ h2, p {
 	font-size: 20px;
 	padding: 10px;
 	width: 100px;
-	transition: all 0.5s;
 	cursor: pointer;
 	margin: 5px;
 }
 
-button.disabled{
-	background: #999;
+.button-disabled{
+	border-radius: 8px;
+	background-color: #999;
+	border: none;
 	color: #555;
+	text-align: center;
+	font-size: 20px;
+	padding: 10px;
+	width: 100px;
+	margin: 5px;
 	cursor: not-allowed;
 }
 .disabled { /* for disabling buttons (later use) */

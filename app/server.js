@@ -47,10 +47,19 @@ io.on("connection", function (socket) {
         console.log("user disconnected");
     });
 
+    socket.on("drawClick", function (data) {
+        socket.broadcast.emit("draw", {
+            xcor: data.xcor,
+            ycor: data.ycor,
+            drawnf: data.drawnf,
+            strokeSize: data.strokeSize,
+            strokeColor: data.strokeColor,
+        });
+    });
+
     socket.on("joinRoom", ({ username, roomNum }) => {
         // loosely based on: https://github.com/bradtraversy/chatcord
         const user = joinRoom(socket.id, username, roomNum);
-
         //pool.query('UPDATE users SET roomID = $1 where username = $2', [user.roomNum, user.username]);
 
         socket.join(user.roomNum);

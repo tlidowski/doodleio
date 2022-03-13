@@ -1,13 +1,12 @@
-//set up artist space
-var flag = false;
-var drawnf = false;
-var lastf;
-var strokeColor;
-var strokeSize;
-var fill = document.getElementById("fill");
-var pencil = document.getElementById("pencil");
-var eraser = document.getElementById("eraser");
-var colors = [
+//set up artist spaceletr flag=false;
+let drawnf = false;
+let lastf;
+let strokeColor;
+let strokeSize;
+let fill = document.getElementById("fill");
+let pencil = document.getElementById("pencil");
+let eraser = document.getElementById("eraser");
+let colors = [
     "#ff1616",
     "#ff914d",
     "#ffde59",
@@ -24,13 +23,14 @@ var colors = [
     "#737373",
 ];
 let testSpeed = 1000; //Keep default at 1000 for timer
-var easyWords = [
+let easyWords = [
     //Put into .txt and import? Or from Database
     "dog",
     "cat",
     "elephant",
     "happy",
 ];
+
 //Current Default; Change When Artist Characteristic is Accessible
 let isArtist = false;
 
@@ -45,20 +45,43 @@ let guess;
 let timerBox = document.getElementById("timer-space");
 let seconds = 60;
 
-let turnInProgress = true;
-let intervalId = null;
-let turnStarted = false;
-
+//Drawing Box
 let doodleBox = document.getElementById("drawing-board");
 let ctx = doodleBox.getContext("2d");
 
 let lastSentf;
 
-socket.emit("joinRoom", { username: "kyleQ", roomNum: "5" });
+// Gameflow globals
+let playingUsers = {}; //object that holds username:points pairs.
+let roundNumber;
+
+function countDown() {
+    timerBox.textContent = `Time Remaining: ${seconds}`;
+    if (seconds > 0) {
+        seconds--;
+    } else {
+        turnInProgress = false;
+        timerBox.textContent = "Turn Over";
+    }
+}
+
+function checkTurnStatus() {
+    if (turnInProgress && !turnStarted) {
+        turnStarted = true;
+        intervalId = setInterval(countDown, testSpeed);
+    } else if (!turnInProgress) {
+        clearInterval(intervalId);
+        turnStarted = false;
+    }
+}
+checkTurnStatus();
+setInterval(checkTurnStatus, 1000);
+
+//Canvas set up
 
 function setup() {
-    var currentColor = document.getElementById("currentColor");
-    var styleRow = document.getElementById("styleRow");
+    let currentColor = document.getElementById("currentColor");
+    let styleRow = document.getElementById("styleRow");
     currentColor.style.height = "50px";
     currentColor.style.width = "50px";
     for (let color = 0; color < colors.length; color++) {
@@ -78,8 +101,8 @@ function setup() {
         row.append(col);
     }
     for (let size = 1; size <= 4; size++) {
-        var col = document.createElement("td");
-        var element = document.createElement("div");
+        let col = document.createElement("td");
+        let element = document.createElement("div");
         element.classList.add("box");
         element.style.borderRadius = "50%";
         element.style.backgroundColor = "black";
@@ -92,7 +115,90 @@ function setup() {
         styleRow.append(col);
     }
 }
-//
+
+/*
+	Doodle Box -- Sets up canvas and allows for drawing, drawings appear in real-time for other clients.
+	Drawing emit implemented from: https://github.com/wesbos/websocket-canvas-draw/blob/master/scripts.js
+*/
+
+let draw = function (xcor, ycor, drawnf) {
+    lastSentf = { x: xcor, y: ycor };
+};
+
+let draw = function (xcor, ycor, drawnf, strokeSize, strokeColor) {
+    ctx.beginPath();
+
+    if (drawnf) {
+        ctx.lineCap = "round";
+        ctx.moveTo(lastSentf.x, lastSentf.y);
+        ctx.lineTo(xcor, ycor);
+        ctx.lineWidth = strokeSize;
+        ctx.strokeStyle = strokeColor;
+        ctx.stroke();
+    }
+    lastSentf = { x: xcor, y: ycor };
+};
+
+socket.on("draw", function (data) {
+    return draw(
+        data.xcor,
+        data.ycor,
+        data.drawnf,
+        data.strokeSize,
+        data.strokeColor
+    );
+});
+
+// size of canvas
+doodleBox.width = 350;
+doodleBox.height = 400;
+
+doodleBox.addEventListener("mousedown", function (e) {
+    flag = true;
+});
+
+doodleBox.addEventListener("mouseup", function (e) {
+    flag = false;
+    drawnf = false;
+    socket.emit("drawnf", { drawnf: false });
+});
+
+pencil.addEventListener("mousedown", function (e) {
+    flag = true;
+});
+
+eraser.addEventListener("mousedown", function (e) {
+    strokeColor = "white";
+});
+
+doodleBox.addEventListener("mousemove", function (e) {
+    if (flag) {
+        ctx.beginPath();
+        let xcor = e.offsetX;
+        let ycor = e.offsetY;
+        if (drawnf) {
+            ctx.lineCap = "round";
+            ctx.moveTo(lastf.x, lastf.y);
+            ctx.lineTo(xcor, ycor);
+            ctx.lineWidth = strokeSize;
+            ctx.strokeStyle = strokeColor;
+            ctx.stroke();
+        }
+        lastf = { x: xcor, y: ycor };
+
+        socket.emit("drawClick", {
+            xcor: xcor,
+            ycor: ycor,
+            drawnf: drawnf,
+            strokeSize: strokeSize,
+            strokeColor: strokeColor,
+        });
+
+        drawnf = true;
+    }
+});
+
+//Generate Word Space
 
 newWordButton.addEventListener("click", function () {
     clearWordSpace();
@@ -124,76 +230,6 @@ function pickAWord(wordList) {
     return pickedWord;
 }
 
-function countDown() {
-    timerBox.textContent = `Time Remaining: ${seconds}`;
-    if (seconds > 0) {
-        seconds--;
-    } else {
-        turnInProgress = false;
-    }
-}
-
-checkTurnStatus();
-setInterval(checkTurnStatus, 1000);
-
-/*
-	Doodle Box -- Sets up canvas and allows for drawing, drawings appear in real-time for other clients.
-	Drawing emit implemented from: https://github.com/wesbos/websocket-canvas-draw/blob/master/scripts.js
-*/
-
-let draw = function (xcor, ycor, drawnf) {
-    lastSentf = { x: xcor, y: ycor };
-};
-
-socket.on("draw", function (data) {
-    return draw(data.xcor, data.ycor, data.drawnf);
-});
-
-// size of canvas
-doodleBox.width = 350;
-doodleBox.height = 400;
-
-doodleBox.addEventListener("mousedown", function (e) {
-    flag = true;
-});
-
-doodleBox.addEventListener("mouseup", function (e) {
-    flag = false;
-    drawnf = false;
-    socket.emit("drawnf", { drawnf: false });
-});
-
-pencil.addEventListener("mousedown", function (e) {
-    flag = true;
-});
-
-eraser.addEventListener("mousedown", function (e) {
-    strokeColor = "white";
-});
-
-fill.addEventListener("mousedown", function (e) {
-    flag = true;
-});
-
-doodleBox.addEventListener("mousemove", function (e) {
-    if (flag) {
-        ctx.beginPath();
-        var xcor = e.offsetX;
-        var ycor = e.offsetY;
-        if (drawnf) {
-            ctx.lineCap = "round";
-            ctx.moveTo(lastf.x, lastf.y);
-            ctx.lineTo(xcor, ycor);
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = strokeColor;
-            ctx.stroke();
-        }
-        lastf = { x: xcor, y: ycor };
-
-        socket.emit("drawClick", { xcor: xcor, ycor: ycor, drawnf: drawnf });
-
-        drawnf = true;
-    }
-});
-
 //LeaderBoard Box
+
+// Gameflow!
