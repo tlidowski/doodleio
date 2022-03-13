@@ -11,6 +11,36 @@ var colors = ["#ff1616", "#ff914d", "#ffde59",
 	      "#c9e265", "#7ed957", "#008037", "#5ce1e6", "#38b6ff","#5271ff",
 	      "#8c52ff", "#ffc6c4", "#000000","#492b16",
 	      "#737373"]
+let testSpeed = 1000 //Keep default at 1000 for timer
+var easyWords = [ //Put into .txt and import? Or from Database
+	"dog",
+	"cat",
+	"elephant",
+	"happy"
+]
+//Current Default; Change When Artist Characteristic is Accessible
+let isArtist = false
+
+//Word Box
+let wordBox = document.getElementById("underscore-space")
+
+let newWordButton = document.getElementById("newWordButton")
+//Guess Box
+let guess
+
+//Timer
+let timerBox = document.getElementById("timer-space")
+let seconds = 60
+
+let turnInProgress = true
+let intervalId = null
+let turnStarted = false
+
+
+let doodleBox = document.getElementById("drawing-board");
+let ctx = doodleBox.getContext("2d");
+
+let lastSentf;
 
 function setup(){
     var currentColor= document.getElementById("currentColor");
@@ -46,20 +76,6 @@ function setup(){
     }
 }
 //
-let testSpeed = 1000 //Keep default at 1000 for timer
-var easyWords = [ //Put into .txt and import? Or from Database
-	"dog",
-	"cat",
-	"elephant",
-	"happy"
-]
-//Current Default; Change When Artist Characteristic is Accessible
-let isArtist = false
-
-//Word Box
-let wordBox = document.getElementById("underscore-space")
-
-let newWordButton = document.getElementById("newWordButton")
 
 newWordButton.addEventListener("click", function() {
 	clearWordSpace()
@@ -91,12 +107,7 @@ function pickAWord(wordList) { //To be changed to connect to database
 	return pickedWord
 }
 
-//Guess Box
-let guess
 
-//Timer
-let timerBox = document.getElementById("timer-space")
-let seconds = 60
 function countDown() {
 	timerBox.textContent = `Time Remaining: ${seconds}`
 	if (seconds > 0){
@@ -105,10 +116,6 @@ function countDown() {
 		turnInProgress = false
 	}
 }
-
-let turnInProgress = true
-let intervalId = null
-let turnStarted = false
 
 checkTurnStatus()
 setInterval(checkTurnStatus, 1000)
@@ -120,23 +127,9 @@ setInterval(checkTurnStatus, 1000)
 	Drawing emit implemented from: https://github.com/wesbos/websocket-canvas-draw/blob/master/scripts.js
 */
 
-let doodleBox = document.getElementById("drawing-board");
-let ctx = doodleBox.getContext("2d");
 
-let lastSentf;
 
 let draw = function(xcor, ycor, drawnf) {
-	ctx.beginPath();
-
-	if(drawnf){
-	    ctx.lineCap = "round";
-	    ctx.moveTo(lastSentf.x, lastSentf.y)
-	    ctx.lineTo(xcor, ycor);
-	    ctx.lineWidth = 1;
-	    ctx.stroke();
-	}
-
-
 	lastSentf = {x: xcor, y: ycor};
 }
 
@@ -160,6 +153,19 @@ doodleBox.addEventListener('mouseup',function(e) {
     socket.emit('drawnf', {drawnf: false});
 });
 
+
+pencil.addEventListener('mousedown',function(e) {
+    flag=true;
+});
+
+eraser.addEventListener('mousedown',function(e) {
+    strokeColor="white";
+});
+
+fill.addEventListener('mousedown',function(e) {
+    flag=true;
+});
+
 doodleBox.addEventListener('mousemove',function(e) {
     if(flag){
 	ctx.beginPath();
@@ -170,6 +176,7 @@ doodleBox.addEventListener('mousemove',function(e) {
 	    ctx.moveTo(lastf.x, lastf.y)
 	    ctx.lineTo(xcor, ycor);
 	    ctx.lineWidth = 1;
+	    ctx.strokeStyle = strokeColor;
 	    ctx.stroke();
 	}
 	lastf = {x: xcor, y: ycor};
