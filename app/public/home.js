@@ -64,7 +64,7 @@ document.getElementById("signUp").addEventListener("click", function () {
 			console.log("Successful New Account");
 			
 		} else if (response.status === 401) {
-			alert("Account Name Taken")
+			alert("Username must be 1-20 characters and Password must be 5-36 characters.")
 			console.log("Failed New Account");
 		} else {
 			console.log("Failed New Account");
