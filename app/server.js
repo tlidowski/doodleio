@@ -92,8 +92,8 @@ app.get("/guess", function (req, res) {
 });
 
 //User Authentication
-app.post("/user", function (req, res) {
-    let username = req.body.username;
+app.post("/user", function (req, res) { //signup
+    let username = req.body.username; 
     let plaintextPassword = req.body.plaintextPassword;
     // TODO check body has username and plaintextPassword keys
     // TODO check password length >= 5 and <= 36
@@ -145,7 +145,7 @@ app.post("/user", function (req, res) {
         });
 });
 
-app.post("/auth", function (req, res) {
+app.post("/auth", function (req, res) { //login
     console.log("Attempting...");
     let username = req.body.username;
     let plaintextPassword = req.body.plaintextPassword;
@@ -156,7 +156,7 @@ app.post("/auth", function (req, res) {
                 // username doesn't exist
                 return res.status(401).send();
             }
-            let hashedPassword = response.rows[0].userPass;
+            let hashedPassword = response.rows[0].userpass;
             bcrypt
                 .compare(plaintextPassword, hashedPassword)
                 .then(function (isSame) {
