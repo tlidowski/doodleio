@@ -123,9 +123,6 @@ setInterval(checkTurnStatus, 1000)
 let doodleBox = document.getElementById("drawing-board");
 let ctx = doodleBox.getContext("2d");
 
-let flag = false;
-let drawnf = false;
-let lastf;
 let lastSentf;
 
 let draw = function(xcor, ycor, drawnf) {
