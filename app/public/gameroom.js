@@ -37,6 +37,7 @@ let intervalId = null
 let turnStarted = false
 
 
+
 function countDown() {
 	timerBox.textContent = `Time Remaining: ${seconds}`
 	if (seconds > 0){
@@ -149,11 +150,22 @@ function pickAWord(wordList) { //To be changed to connect to database
 
 
 let draw = function(xcor, ycor, drawnf) {
+
+	ctx.beginPath();
+
+	if(drawnf){
+	    ctx.lineCap = "round";
+	    ctx.moveTo(lastSentf.x, lastSentf.y)
+	    ctx.lineTo(xcor, ycor);
+	    ctx.lineWidth = 1;
+	    ctx.stroke();
+	}
 	lastSentf = {x: xcor, y: ycor};
 }
 
 
 socket.on('draw', function(data) {
+	
 	return draw(data.xcor, data.ycor, data.drawnf);
 });
 
@@ -179,10 +191,6 @@ pencil.addEventListener('mousedown',function(e) {
 
 eraser.addEventListener('mousedown',function(e) {
     strokeColor="white";
-});
-
-fill.addEventListener('mousedown',function(e) {
-    flag=true;
 });
 
 doodleBox.addEventListener('mousemove',function(e) {
