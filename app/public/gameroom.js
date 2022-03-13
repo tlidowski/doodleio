@@ -37,6 +37,33 @@ let intervalId = null
 let turnStarted = false
 
 
+function countDown() {
+	timerBox.textContent = `Time Remaining: ${seconds}`
+	if (seconds > 0){
+		seconds--
+	} else {
+		turnInProgress = false
+		timerBox.textContent = "Turn Over"
+	}
+}
+
+function checkTurnStatus() {
+	if (turnInProgress && !turnStarted) {
+		turnStarted = true
+		intervalId = setInterval(countDown, testSpeed)
+
+	} else if (!turnInProgress) {
+		clearInterval(intervalId)
+		turnStarted = false
+
+	}
+}
+checkTurnStatus()
+setInterval(checkTurnStatus, 1000)
+
+//doodle stuff
+
+
 let doodleBox = document.getElementById("drawing-board");
 let ctx = doodleBox.getContext("2d");
 
@@ -75,7 +102,8 @@ function setup(){
 	styleRow.append(col);
     }
 }
-//
+
+//Generate Word Space
 
 newWordButton.addEventListener("click", function() {
 	clearWordSpace()
@@ -108,17 +136,8 @@ function pickAWord(wordList) { //To be changed to connect to database
 }
 
 
-function countDown() {
-	timerBox.textContent = `Time Remaining: ${seconds}`
-	if (seconds > 0){
-		seconds--
-	} else {
-		turnInProgress = false
-	}
-}
 
-checkTurnStatus()
-setInterval(checkTurnStatus, 1000)
+
 
 
 
