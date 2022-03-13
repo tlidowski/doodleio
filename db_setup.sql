@@ -27,7 +27,7 @@ INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, current
 -- table for list of users
 CREATE TABLE users(
     username VARCHAR(32) PRIMARY KEY,
-    user_pass VARCHAR(32), 
+    userPass VARCHAR(32), 
     numGames INT, 
     numWon INT, 
     highScore INT, 
