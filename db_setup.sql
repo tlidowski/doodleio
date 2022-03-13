@@ -18,6 +18,12 @@ CREATE TABLE rooms(
     roundNum INT, 
     currentTurn INT);
 
+INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('WMJH', true, false, 0, 0, 1);
+INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('JFRC', true, false, 0, 0, 1);
+INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('LVNR', true, false, 0, 0, 1);
+INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('OOZK', true, false, 0, 0, 1);
+INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('QMAJ', true, false, 0, 0, 1);
+
 -- table for list of users
 CREATE TABLE users(
     username VARCHAR(32) PRIMARY KEY,
