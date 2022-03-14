@@ -100,6 +100,10 @@ document.getElementById("signUp").addEventListener("click", function () {
 		}
 	})
 });
+
+document.getElementById("user-requirements").addEventListener("click", function() {
+	alert("Username must be 1-20 characters \nPassword must be 5-36 characters")
+})
 document.getElementById("signOut").addEventListener("click", function() {
 	let isSignedIn = false
 	accountStatus(isSignedIn)

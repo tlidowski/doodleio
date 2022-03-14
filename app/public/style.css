@@ -76,6 +76,16 @@
 	
 }
 
+.infobutton {
+	display: block;
+	margin-left: auto;
+	top: 0cm;
+	width: 3%;
+	height: 3%;
+	padding: 10px;
+	
+}
+
 .logininfo {
 	padding: 1rem;
 	margin: 2rem 0;
