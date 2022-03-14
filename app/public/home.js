@@ -18,13 +18,9 @@ newGameButton.onclick = function() {
 
 ADD YOUR CLIENT-SIDE CODE FOR add.html HERE
 */
-document.cookie = "";
 
 function setCookie(value) {
-    const d = new Date();
-    d.setTime(d.getTime() + (24*60*60*1000));
-    let exp = d.toUTCString();
-    document.cookie = "username=" + value + ";expires=" + exp + ";path=/";
+    document.cookie = "username=" + value;
 }
 
 function getCookie(cname) {
@@ -47,6 +43,11 @@ let isSignedIn = false
 let usernameInput = document.getElementById("username");
 let passwordInput = document.getElementById("password");
 
+if (!(getCookie("username") == "")) {
+	isSignedIn = true;
+	accountStatus(isSignedIn);
+}
+
 document.getElementById("logIn").addEventListener("click", function () {
 	fetch("/auth", {
 		method: "POST",
@@ -59,11 +60,11 @@ document.getElementById("logIn").addEventListener("click", function () {
 		})
 	}).then(function (response) {
 		if (response.status === 200) {
+			setCookie(usernameInput.value);
 			console.log("Successful Login");
 			alert("You're In!");
 			isSignedIn = true;
 			accountStatus(isSignedIn);
-			setCookie(usernameInput.value);
 		} else {
 			console.log("Failed Login");
 			alert("Something went wrong...")
@@ -85,12 +86,12 @@ document.getElementById("signUp").addEventListener("click", function () {
 		})
 	}).then(function (response) {
 		if (response.status === 200) {
+			setCookie(usernameInput.value);
 			alert("Account Created Successfully.");
 			alert("Signing You In...");
 			console.log("Successful New Account");
 			isSignedIn = true;
 			accountStatus(isSignedIn);
-			setCookie(usernameInput.value);
 		} else if (response.status === 401) {
 			alert("Username must be 1-20 characters and Password must be 5-36 characters.")
 			console.log("Failed New Account");
@@ -105,7 +106,7 @@ document.getElementById("signOut").addEventListener("click", function() {
 })
 
 function accountStatus(signInStatus) {
-	alert(`Changing Account Status to ${signInStatus}`)
+	//alert(`Changing Account Status to ${signInStatus}`)
 	let inputBox = document.getElementById("inputBox")
 	let logInButton = document.getElementById("logIn")
 	let signUpButton = document.getElementById("signUp")
@@ -125,6 +126,7 @@ function accountStatus(signInStatus) {
 		newGameButton.classList.replace('button-disabled', 'button')
 		joinGameButton.classList.replace('button-disabled', 'button')
 	} else {
+		document.cookie = "username=";
 		console.log("Logging Out")
 		inputBox.removeAttribute("hidden")
 		logInButton.removeAttribute("hidden")
@@ -133,6 +135,11 @@ function accountStatus(signInStatus) {
 		accountInfoButton.setAttribute("hidden", "hidden")
 		newGameButton.classList.replace('button', 'button-disabled')
 		joinGameButton.classList.replace('button', 'button-disabled')
+		console.log(getCookie("username"));
 	}
 }
 
+module.exports = {
+    setCookie,
+	getCookie
+};
