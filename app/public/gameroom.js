@@ -31,6 +31,13 @@ let params = new URLSearchParams(urlString);
 
 console.log(params.get("roomId"));
 
+//update header bar
+let roomCodeSpace = document.getElementById("roomcode-space")
+let roundSpace = document.getElementById("round-space")
+let turnSpace = document.getElementById("turn-space")
+let artistSpace = document.getElementById("artist-space")
+roomCodeSpace.textContent = `${params.get("roomId")}`
+
 //Current Default; Change When Artist Characteristic is Accessible
 let isArtist = false;
 
@@ -339,6 +346,9 @@ socket.on("activePlayers", function (data) {
 
 
 function doodlioTurn(){
+        turnSpace.textContent = `Turn: ${turn}`
+        roundSpace.textContent = `Round: ${(3-roundsLeft) + 1}`
+        artistSpace.textContent = `Artist: ${activePlayers[turn-1]}`
         console.log("CURRENT TURN: " + turn + " and Round: " + ((3-roundsLeft) + 1));
         correctGuesses = 0;
 

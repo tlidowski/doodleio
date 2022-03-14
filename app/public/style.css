@@ -38,7 +38,35 @@
 	border: none;
 	width: 149px;
 	height: 50px;
+	background-color: blue;
+	text-align: center;
+}
+.roomcode{
+	border: none;
+	width: 149px;
+	height: 50px;
 	background-color: whitesmoke;
+	text-align: center;
+}
+.roundspace{
+	border: none;
+	width: 119px;
+	height: 50px;
+	background-color: red;
+	text-align: center;
+}
+.turnspace{
+	border: none;
+	width: 109px;
+	height: 50px;
+	background-color: yellow;
+	text-align: center;
+}
+.artistspace{
+	border: none;
+	width: 119px;
+	height: 50px;
+	background-color: green;
 	text-align: center;
 }
 .guessspace{
