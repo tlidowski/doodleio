@@ -23,7 +23,7 @@ let colors = [
     "#492b16",
     "#737373",
 ];
-let testSpeed = 1000; //Keep default at 1000 for timer
+let milliPerSec = 1000; //Keep default at 1000 for timer
 let easyWords = [];
 
 let urlString = window.location.search;
@@ -43,13 +43,12 @@ let guess;
 
 //Timer
 let timerBox = document.getElementById("timer-space");
-let roundSeconds = 60;
-let cooldownSeconds = 5;
+let turnSeconds = 60*(milliPerSec/1000);
+let cooldownSeconds = 5*(milliPerSec/1000);
 
 let turnInProgress = true;
 let countdownInterval = null;
 let cooldownInterval = null;
-let turnStarted = false;
 
 //Drawing Box
 let doodleBox = document.getElementById("drawing-board");
@@ -82,8 +81,6 @@ function getCookie(cname) {
     return "";
 }
 
-let revealsLeft;
-
 socket.emit("joinRoom", { username: getCookie("username"), roomNum: params.get("roomId") });
 
 function coolDown() {
@@ -98,9 +95,9 @@ function coolDown() {
 }
 
 function countDown() {
-    timerBox.textContent = `Time Remaining: ${roundSeconds}`;
-    if (roundSeconds > 0) {
-        roundSeconds--;
+    timerBox.textContent = `Time Remaining: ${turnSeconds}`;
+    if (turnSeconds > 0) {
+        turnSeconds--;
     } else {
         isArtist = false;
         timerBox.textContent = "Turn Over";
@@ -116,24 +113,12 @@ function countDown() {
         if (roundsLeft <= 0) {
             timerBox.textContent = "Game Over!";
         } else {
-            cooldownSeconds = 5;
-            cooldownInterval = setInterval(coolDown, testSpeed);
+            cooldownSeconds = 5*(milliPerSec/1000);
+            cooldownInterval = setInterval(coolDown, milliPerSec);
         }
 
     }
 }
-
-function checkTurnStatus() {
-    if (turnInProgress && !turnStarted) {
-        turnStarted = true;
-        //intervalId = setInterval(countDown, testSpeed); (sorry dora, im testing)
-    } else if (!turnInProgress) {
-       // clearInterval(intervalId);
-        turnStarted = false;
-    }
-}
-checkTurnStatus();
-setInterval(checkTurnStatus, 1000);
 
 //Canvas set up
 
@@ -265,9 +250,9 @@ newWordButton.addEventListener("click", function () {
     let pickedIndices = []
     updateWordBox(letterList, pickedIndices);
 
-    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*testSpeed*.5)
-    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*testSpeed*.75)
-    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*testSpeed*.9)
+    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.5)
+    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.75)
+    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.9)
 
 
 });
@@ -366,8 +351,8 @@ function doodlioTurn(){
         }
         ctx.clearRect(0, 0, doodleBox.width, doodleBox.height);
 
-        roundSeconds = 10;
-        countdownInterval = setInterval(countDown, testSpeed);
+        turnSeconds = 60*(milliPerSec/1000);
+        countdownInterval = setInterval(countDown, milliPerSec);
 
     
 }
