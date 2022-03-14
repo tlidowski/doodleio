@@ -182,7 +182,7 @@ doodleBox.width = 350;
 doodleBox.height = 400;
 
 function emitDraw (e) {
-    if (flag) {
+    if (flag && isArtist) {
         ctx.beginPath();
         let xcor = e.offsetX;
         let ycor = e.offsetY;
@@ -299,4 +299,6 @@ function gameFlow() {
     }
 
     currentTurn += 1;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
 }
