@@ -82,7 +82,11 @@ io.on("connection", function (socket) {
 
             socket.join(user.roomNum);
 
-            
+            //update rooms
+            pool.query('UPDATE rooms SET numplayers = numplayers + 1 where roomid = $1', [user.roomNum])
+            .catch(function(error){
+                return -1;
+             });
 
             // check amount of people in room
             let numPlayers = await selectFrom('numplayers','rooms', `WHERE roomid = $1`, [user.roomNum]); 
@@ -129,10 +133,13 @@ io.on("connection", function (socket) {
 
     socket.on("disconnect", async function ()  {
         console.log("user disconnected");
-
+        let room;
+        
         for (let i = 0; i < userRoomsLocalStorage.length; i++) {
             let user = userRoomsLocalStorage[i];
             if (user.id === socket.id) {
+
+                room = user.roomNum;
 
                 //update users
                 pool.query('UPDATE users SET roomid = $1 where username = $2', ['blank', user.username])
@@ -142,9 +149,9 @@ io.on("connection", function (socket) {
 
                 //update rooms
                 pool.query('UPDATE rooms SET numplayers = numplayers - 1 where roomid = $1', [user.roomNum])
-                .then(function(response){
-                    //console.log(response); // switch to async.
-                 });
+                    .catch(function(error){
+                        return -1;
+                     });
 
                  let numPlayers = await selectFrom('numplayers','rooms', `WHERE roomid = $1`, [user.roomNum]); 
 
@@ -153,19 +160,23 @@ io.on("connection", function (socket) {
                         .catch(function(error){
                             return -1;
                     }); 
+
+                
             }
 
+            
                 userRoomsLocalStorage.splice(i, 1);
 
-                 // send out active players
                 let listPlayers = [];
                 for (let userInfo in userRoomsLocalStorage) {
-                    if (userRoomsLocalStorage[userInfo].roomNum === user.roomNum){
+                    if (userRoomsLocalStorage[userInfo].roomNum === room){
                         listPlayers.push(userRoomsLocalStorage[userInfo].username);
                     }
                 }
-                console.log(listPlayers);
+                io.in(user.roomNum).emit("activePlayers", {activePlayers:listPlayers});
                 console.log("deleted user ");
+
+                
             }
         }
 

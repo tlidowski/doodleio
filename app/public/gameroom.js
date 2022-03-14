@@ -110,7 +110,7 @@ function countDown() {
         timerBox.textContent = "Turn Over";
         clearInterval(countdownInterval);
 
-        if (turn === activePlayers.length) {
+        if (turn >= activePlayers.length) {
             turn = 1;
             roundsLeft -= 1;
         } else {
