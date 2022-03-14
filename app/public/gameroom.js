@@ -62,6 +62,7 @@ let ctx = doodleBox.getContext("2d");
 let lastSentf;
 
 // Gameflow globals
+let startButton = document.getElementById("start-button")
 let playingUsers = {}; //object that holds username:points pairs.
 let roundNumber;
 
@@ -88,6 +89,7 @@ function countDown() {
     timerBox.textContent = `Time Remaining: ${seconds}`;
     if (seconds > 0) {
         seconds--;
+        //socket.emit("tickDown",{seconds:seconds});
     } else {
         turnInProgress = false;
         timerBox.textContent = "Turn Over";
@@ -97,7 +99,7 @@ function countDown() {
 function checkTurnStatus() {
     if (turnInProgress && !turnStarted) {
         turnStarted = true;
-        intervalId = setInterval(countDown, testSpeed);
+        //intervalId = setInterval(countDown, testSpeed); (sorry dora, im testing)
     } else if (!turnInProgress) {
         clearInterval(intervalId);
         turnStarted = false;
@@ -258,3 +260,11 @@ function pickAWord(wordList) {
 //LeaderBoard Box
 
 // Gameflow!
+
+socket.on("startClock", function (data) {
+    setInterval(countDown, testSpeed);
+});
+
+startButton.addEventListener("click", function() {
+    socket.emit("pressedStart", {roomNum: params.get("roomId")});
+})
