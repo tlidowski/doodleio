@@ -65,7 +65,24 @@ let lastSentf;
 let playingUsers = {}; //object that holds username:points pairs.
 let roundNumber;
 
-socket.emit("joinRoom", { username: "kyle", roomNum: params.get("roomId") });
+// Cookies
+function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
+
+socket.emit("joinRoom", { username: getCookie("username"), roomNum: params.get("roomId") });
 
 function countDown() {
     timerBox.textContent = `Time Remaining: ${seconds}`;

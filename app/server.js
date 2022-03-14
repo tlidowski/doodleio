@@ -18,6 +18,21 @@ const { createRoom, startRoom, joinRoom, leaveRoom } = require("./roommanager");
     //console.log(`Connected to database ${env.database}`);
 });*/
 
+// SQL Functions -- Taken from https://stackoverflow.com/questions/58254717/returning-the-result-of-a-node-postgres-query
+
+async function selectFrom(data, table, condition, parameters) {
+    try {
+      const res = await pool.query(
+        `SELECT ${data} FROM ${table} ${condition}`, parameters
+      );
+      return res.rows[0][data];
+    } catch (err) {
+      return err.stack;
+    }
+  }
+
+
+
 //Taken From Login/Create Exercise
 const saltRounds = 10;
 const env = require("../env.json");
@@ -45,22 +60,38 @@ userRoomsLocalStorage = [];
 io.on("connection", function (socket) {
     console.log("a user connected");
 
-    socket.on("disconnect", () => {
-        console.log("user disconnected");
-        for (let i = 0; i < userRoomsLocalStorage.length; i++) {
-            let user = userRoomsLocalStorage[i];
-            if (user.id === socket.id) {
-                console.log("deleted user " + user);
-                userRoomsLocalStorage.splice(i, 1);
-            }
-        }
+
+    socket.on("joinRoom", async function ({ username, roomNum }) {
+        // loosely based on: https://github.com/bradtraversy/chatcord
+        
+        id = socket.id;
+        const user = { id, username, roomNum };
+
+       /* pool.query('SELECT isplaying FROM rooms WHERE roomid = $1', [user.roomNum])
+            .then(function (response) {
+                console.log("isPlaying for " + user.roomNum + " is " + response.rows);
+            });*/
+
+        var result = await selectFrom('isplaying','rooms', `WHERE roomid = $1`, [user.roomNum]);
+        console.log(result);
+
+        pool.query('UPDATE users SET roomID = $1 where username = $2', [user.roomNum, user.username])
+            .catch(function(error){
+                return -1;
+            });
+
+        userRoomsLocalStorage.push({ roomNum: roomNum, id: socket.id });
+
+        socket.join(user.roomNum);
+
+        console.log(user.username + "joined " + user.roomNum);
     });
 
     socket.on("drawClick", function (data) {
         // from https://github.com/bradtraversy/chatcord
 
         user = userRoomsLocalStorage.find((user) => user.id === socket.id);
-
+        console.log(user.roomNum);
         socket.broadcast.to(user.roomNum).emit("draw", {
             xcor: data.xcor,
             ycor: data.ycor,
@@ -70,20 +101,15 @@ io.on("connection", function (socket) {
         });
     });
 
-    socket.on("joinRoom", ({ username, roomNum }) => {
-        // loosely based on: https://github.com/bradtraversy/chatcord
-        const user = joinRoom(socket.id, username, roomNum);
-        
-        pool.query('UPDATE users SET roomID = $1 where username = $2', [user.roomNum, user.username])
-            .catch(function(error){
-                return res.sendStatus(500);
-            });
-
-        userRoomsLocalStorage.push({ roomNum: roomNum, id: socket.id });
-
-        socket.join(user.roomNum);
-
-        console.log(user.username + "joined " + user.roomNum);
+    socket.on("disconnect", () => {
+        console.log("user disconnected");
+        for (let i = 0; i < userRoomsLocalStorage.length; i++) {
+            let user = userRoomsLocalStorage[i];
+            if (user.id === socket.id) {
+                console.log("deleted user " + user);
+                userRoomsLocalStorage.splice(i, 1);
+            }
+        }
     });
 });
 

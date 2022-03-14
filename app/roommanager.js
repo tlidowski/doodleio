@@ -36,10 +36,16 @@ function startRoom(roomNum) {
 function joinRoom(id, username, roomNum) {
     const user = { id, username, roomNum };
 
+    //change to database
     for (let room of rooms) {
-        if (room.roomNum === roomNum) {
-            if (!room.game_occ) {
-                users.push(user);
+        if (room.roomNum === roomNum) { //Select where room number 
+            if (!room.game_occ) { //if gameOcc
+                pool.query('UPDATE users SET roomID = $1 where username = $2', [user.roomNum, user.username])
+                    .catch(function(error){
+                        return res.sendStatus(500);
+                    });
+                //socket join
+                 
             } else {
                 console.log("game already started");
             }
