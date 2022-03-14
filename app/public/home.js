@@ -142,8 +142,3 @@ function accountStatus(signInStatus) {
 		console.log(getCookie("username"));
 	}
 }
-
-module.exports = { //get rid of?
-    setCookie,
-	getCookie
-};

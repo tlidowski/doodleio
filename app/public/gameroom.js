@@ -43,10 +43,12 @@ let guess;
 
 //Timer
 let timerBox = document.getElementById("timer-space");
-let seconds = 60;
+let roundSeconds = 60;
+let cooldownSeconds = 5;
 
 let turnInProgress = true;
-let intervalId = null;
+let countdownInterval = null;
+let cooldownInterval = null;
 let turnStarted = false;
 
 //Drawing Box
@@ -58,7 +60,8 @@ let lastSentf;
 // Gameflow globals
 let startButton = document.getElementById("start-button")
 let activePlayers = []; //list that holds username:points pairs.
-let currentTurn = 1;
+let correctGuesses = 0;
+let turn = 1;
 let roundsLeft = 3;
 
 
@@ -83,14 +86,40 @@ let revealsLeft;
 
 socket.emit("joinRoom", { username: getCookie("username"), roomNum: params.get("roomId") });
 
-function countDown() {
-    timerBox.textContent = `Time Remaining: ${seconds}`;
-    if (seconds > 0) {
-        seconds--;
-        //socket.emit("tickDown",{seconds:seconds});
+function coolDown() {
+    timerBox.textContent = `Next Turn Starts In: ${cooldownSeconds}`;
+    if (cooldownSeconds > 0) {
+        cooldownSeconds--;
     } else {
         turnInProgress = false;
+        clearInterval(cooldownInterval);
+        doodlioTurn();
+    }
+}
+
+function countDown() {
+    timerBox.textContent = `Time Remaining: ${roundSeconds}`;
+    if (roundSeconds > 0) {
+        roundSeconds--;
+    } else {
+        isArtist = false;
         timerBox.textContent = "Turn Over";
+        clearInterval(countdownInterval);
+
+        if (turn === activePlayers.length) {
+            turn = 1;
+            roundsLeft -= 1;
+        } else {
+            turn += 1;
+        }
+
+        if (roundsLeft <= 0) {
+            timerBox.textContent = "Game Over!";
+        } else {
+            cooldownSeconds = 5;
+            cooldownInterval = setInterval(coolDown, testSpeed);
+        }
+
     }
 }
 
@@ -99,7 +128,7 @@ function checkTurnStatus() {
         turnStarted = true;
         //intervalId = setInterval(countDown, testSpeed); (sorry dora, im testing)
     } else if (!turnInProgress) {
-        clearInterval(intervalId);
+       // clearInterval(intervalId);
         turnStarted = false;
     }
 }
@@ -287,8 +316,7 @@ function pickAWord(difficulty) {
 
 //syncing clocks
 socket.on("startClock", function (data) {
-    setInterval(countDown, testSpeed);
-    gameFlow();
+    doodlioTurn();
 });
 
 startButton.addEventListener("click", function() {
@@ -305,20 +333,21 @@ socket.on("activePlayers", function (data) {
 
 
 
-function gameFlow() {
-    console.log("CURRENT TURN: " + currentTurn);
-    if (activePlayers[currentTurn-1] === getCookie("username")) {
-        console.log(activePlayers[currentTurn-1] + " is artist!");
-        isArtist = true;
-    } else {
-        isArtist = false;
-    }
+function doodlioTurn(){
+        console.log("CURRENT TURN: " + turn + " and Round: " + ((3-roundsLeft) + 1));
+        correctGuesses = 0;
+
+
+        if (activePlayers[turn-1] === getCookie("username")) {
+            console.log(activePlayers[turn-1] + " is artist!");
+            isArtist = true;
+        } else {
+            isArtist = false;
+        }
+        ctx.clearRect(0, 0, doodleBox.width, doodleBox.height);
+
+        roundSeconds = 10;
+        countdownInterval = setInterval(countDown, testSpeed);
 
     
-    ctx.clearRect(0, 0, doodleBox.width, doodleBox.height);
-
-    
-    currentTurn += 1;
-    
-
 }
