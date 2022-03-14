@@ -18,6 +18,7 @@ CREATE TABLE rooms(
     roundNum INT, 
     currentTurn INT);
 
+INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('blank', true, false, 0, 0, 0);
 INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('WMJH', true, false, 0, 0, 1);
 INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('JFRC', true, false, 0, 0, 1);
 INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('LVNR', true, false, 0, 0, 1);
