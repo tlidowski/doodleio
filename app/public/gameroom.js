@@ -226,7 +226,7 @@ eraser.addEventListener("mousedown", function (e) {
     strokeColor = "white";
 });
 
-
+doodleBox.addEventListener("mousemove", emitDraw);
 
 
 
@@ -289,16 +289,16 @@ socket.on("activePlayers", function (data) {
 function gameFlow() {
     console.log("CURRENT TURN: " + currentTurn);
     if (activePlayers[currentTurn-1] === getCookie("username")) {
+        console.log(activePlayers[currentTurn-1] + " is artist!");
         isArtist = true;
-    }
-
-    if (isArtist) {
-        doodleBox.addEventListener("mousemove", emitDraw);
     } else {
-        doodleBox.removeEventListener('mousemove', emitDraw);
+        isArtist = false;
     }
 
+    
+    ctx.clearRect(0, 0, doodleBox.width, doodleBox.height);
+
+    
     currentTurn += 1;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 }
