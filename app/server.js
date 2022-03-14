@@ -73,7 +73,11 @@ io.on("connection", function (socket) {
     socket.on("joinRoom", ({ username, roomNum }) => {
         // loosely based on: https://github.com/bradtraversy/chatcord
         const user = joinRoom(socket.id, username, roomNum);
-        //pool.query('UPDATE users SET roomID = $1 where username = $2', [user.roomNum, user.username]);
+        
+        pool.query('UPDATE users SET roomID = $1 where username = $2', [user.roomNum, user.username])
+            .catch(function(error){
+                return res.sendStatus(500);
+            });
 
         userRoomsLocalStorage.push({ roomNum: roomNum, id: socket.id });
 
