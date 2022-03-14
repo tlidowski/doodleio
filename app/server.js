@@ -31,6 +31,17 @@ async function selectFrom(data, table, condition, parameters) {
     }
   }
 
+async function updateReturn(column, data, table, condition, parameters) {
+    try {
+      const res = await pool.query(
+        `UPDATE ${table} SET ${column} = ${data} ${condition}`, parameters
+      );
+      return res.rows[0];
+    } catch (err) {
+      return err.stack;
+    }
+  }
+
 
 
 //Taken From Login/Create Exercise
@@ -67,24 +78,39 @@ io.on("connection", function (socket) {
         id = socket.id;
         const user = { id, username, roomNum };
 
-       /* pool.query('SELECT isplaying FROM rooms WHERE roomid = $1', [user.roomNum])
-            .then(function (response) {
-                console.log("isPlaying for " + user.roomNum + " is " + response.rows);
-            });*/
+        let isPlaying = await selectFrom('isplaying','rooms', `WHERE roomid = $1`, [user.roomNum]); //needs the start button
 
-        var result = await selectFrom('isplaying','rooms', `WHERE roomid = $1`, [user.roomNum]);
-        console.log(result);
+        if (!isPlaying) {
+            
+            //update users
+            pool.query('UPDATE users SET roomID = $1 where username = $2', [user.roomNum, user.username])
+                .catch(function(error){
+                    return -1;
+                 });
 
-        pool.query('UPDATE users SET roomID = $1 where username = $2', [user.roomNum, user.username])
-            .catch(function(error){
-                return -1;
-            });
+            userRoomsLocalStorage.push({ roomNum: roomNum, id: socket.id, username:username });
 
-        userRoomsLocalStorage.push({ roomNum: roomNum, id: socket.id });
+            socket.join(user.roomNum);
 
-        socket.join(user.roomNum);
+            //update rooms
+            pool.query('UPDATE rooms SET numplayers = numplayers + 1 where roomid = $1', [user.roomNum])
+                .catch(function(error){
+                     return -1;
+                 });
 
-        console.log(user.username + "joined " + user.roomNum);
+            // check amount of people in room
+            let numPlayers = await selectFrom('numplayers','rooms', `WHERE roomid = $1`, [user.roomNum]); 
+
+            if (numPlayers >= 4) {
+                pool.query('UPDATE rooms SET isplaying = TRUE where roomid = $1', [user.roomNum])
+                .catch(function(error){
+                     return -1;
+                 }); //redirect --> home.html
+            }
+        
+            console.log(user.username + "joined " + user.roomNum);
+        }
+        
     });
 
     socket.on("drawClick", function (data) {
@@ -101,15 +127,33 @@ io.on("connection", function (socket) {
         });
     });
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", async function ()  {
         console.log("user disconnected");
+
         for (let i = 0; i < userRoomsLocalStorage.length; i++) {
             let user = userRoomsLocalStorage[i];
             if (user.id === socket.id) {
-                console.log("deleted user " + user);
+                console.log(user.username);
+
+                //update users
+                pool.query('UPDATE users SET roomid = $1 where username = $2', ['blank', user.username])
+                     .catch(function(error){
+                         return -1;
+                      });
+
+                //update rooms
+                pool.query('UPDATE rooms SET numplayers = numplayers - 1 where roomid = $1', [user.roomNum])
+                .then(function(response){
+                    //console.log(response); // switch to async.
+                 });
+
                 userRoomsLocalStorage.splice(i, 1);
+
+                console.log("deleted user ");
             }
         }
+
+       
     });
 });
 
