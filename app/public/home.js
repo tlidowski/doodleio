@@ -143,7 +143,7 @@ function accountStatus(signInStatus) {
 	}
 }
 
-module.exports = {
+module.exports = { //get rid of?
     setCookie,
 	getCookie
 };

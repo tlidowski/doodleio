@@ -63,7 +63,7 @@ let lastSentf;
 
 // Gameflow globals
 let startButton = document.getElementById("start-button")
-let playingUsers = {}; //object that holds username:points pairs.
+let activePlayers = []; //list that holds username:points pairs.
 let roundNumber;
 
 // Cookies
@@ -180,50 +180,55 @@ socket.on("draw", function (data) {
 doodleBox.width = 350;
 doodleBox.height = 400;
 
-doodleBox.addEventListener("mousedown", function (e) {
-    flag = true;
-});
+console.log(isArtist);
 
-doodleBox.addEventListener("mouseup", function (e) {
-    flag = false;
-    drawnf = false;
-    socket.emit("drawnf", { drawnf: false });
-});
-
-pencil.addEventListener("mousedown", function (e) {
-    flag = true;
-});
-
-eraser.addEventListener("mousedown", function (e) {
-    strokeColor = "white";
-});
-
-doodleBox.addEventListener("mousemove", function (e) {
-    if (flag) {
-        ctx.beginPath();
-        let xcor = e.offsetX;
-        let ycor = e.offsetY;
-        if (drawnf) {
-            ctx.lineCap = "round";
-            ctx.moveTo(lastf.x, lastf.y);
-            ctx.lineTo(xcor, ycor);
-            ctx.lineWidth = strokeSize;
-            ctx.strokeStyle = strokeColor;
-            ctx.stroke();
+if (!isArtist) {
+    doodleBox.addEventListener("mousedown", function (e) {
+        flag = true;
+    });
+    
+    doodleBox.addEventListener("mouseup", function (e) {
+        flag = false;
+        drawnf = false;
+        socket.emit("drawnf", { drawnf: false });
+    });
+    
+    pencil.addEventListener("mousedown", function (e) {
+        flag = true;
+    });
+    
+    eraser.addEventListener("mousedown", function (e) {
+        strokeColor = "white";
+    });
+    
+    doodleBox.addEventListener("mousemove", function (e) {
+        if (flag) {
+            ctx.beginPath();
+            let xcor = e.offsetX;
+            let ycor = e.offsetY;
+            if (drawnf) {
+                ctx.lineCap = "round";
+                ctx.moveTo(lastf.x, lastf.y);
+                ctx.lineTo(xcor, ycor);
+                ctx.lineWidth = strokeSize;
+                ctx.strokeStyle = strokeColor;
+                ctx.stroke();
+            }
+            lastf = { x: xcor, y: ycor };
+    
+            socket.emit("drawClick", {
+                xcor: xcor,
+                ycor: ycor,
+                drawnf: drawnf,
+                strokeSize: strokeSize,
+                strokeColor: strokeColor,
+            });
+    
+            drawnf = true;
         }
-        lastf = { x: xcor, y: ycor };
+    });
+}
 
-        socket.emit("drawClick", {
-            xcor: xcor,
-            ycor: ycor,
-            drawnf: drawnf,
-            strokeSize: strokeSize,
-            strokeColor: strokeColor,
-        });
-
-        drawnf = true;
-    }
-});
 
 //Generate Word Space
 
@@ -259,12 +264,22 @@ function pickAWord(wordList) {
 
 //LeaderBoard Box
 
-// Gameflow!
+// ******************************* Gameflow! ******************************************
 
+//syncing clocks
 socket.on("startClock", function (data) {
+    console.log("test");
     setInterval(countDown, testSpeed);
 });
 
 startButton.addEventListener("click", function() {
     socket.emit("pressedStart", {roomNum: params.get("roomId")});
 })
+
+
+//get list of players
+
+socket.on("activePlayers", function (data) {
+    activePlayers = data.activePlayers;
+    console.log(activePlayers);
+});

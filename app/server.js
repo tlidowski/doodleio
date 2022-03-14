@@ -31,22 +31,12 @@ async function selectFrom(data, table, condition, parameters) {
     }
   }
 
-async function updateReturn(column, data, table, condition, parameters) {
-    try {
-      const res = await pool.query(
-        `UPDATE ${table} SET ${column} = ${data} ${condition}`, parameters
-      );
-      return res.rows[0];
-    } catch (err) {
-      return err.stack;
-    }
-  }
-
 
 
 //Taken From Login/Create Exercise
 const saltRounds = 10;
 const env = require("../env.json");
+const { response } = require("express");
 const Pool = pg.Pool;
 const pool = new Pool(env);
 pool.connect().then(function () {
@@ -92,11 +82,7 @@ io.on("connection", function (socket) {
 
             socket.join(user.roomNum);
 
-            //update rooms
-            pool.query('UPDATE rooms SET numplayers = numplayers + 1 where roomid = $1', [user.roomNum])
-                .catch(function(error){
-                     return -1;
-                 });
+            
 
             // check amount of people in room
             let numPlayers = await selectFrom('numplayers','rooms', `WHERE roomid = $1`, [user.roomNum]); 
@@ -110,6 +96,16 @@ io.on("connection", function (socket) {
             }
         
             console.log(user.username + "joined " + user.roomNum);
+
+            // send out active players
+            let listPlayers = [];
+            for (let userInfo in userRoomsLocalStorage) {
+                if (userRoomsLocalStorage[userInfo].roomNum === user.roomNum){
+                    listPlayers.push(userRoomsLocalStorage[userInfo].username);
+                }
+            }
+            //console.log(listPlayers);
+            io.in(roomNum).emit("activePlayers", {activePlayers:listPlayers});
         }
         
     });
@@ -122,7 +118,6 @@ io.on("connection", function (socket) {
         // from https://github.com/bradtraversy/chatcord
 
         user = userRoomsLocalStorage.find((user) => user.id === socket.id);
-        console.log(user.roomNum);
         socket.broadcast.to(user.roomNum).emit("draw", {
             xcor: data.xcor,
             ycor: data.ycor,
@@ -138,7 +133,6 @@ io.on("connection", function (socket) {
         for (let i = 0; i < userRoomsLocalStorage.length; i++) {
             let user = userRoomsLocalStorage[i];
             if (user.id === socket.id) {
-                console.log(user.username);
 
                 //update users
                 pool.query('UPDATE users SET roomid = $1 where username = $2', ['blank', user.username])
@@ -163,6 +157,14 @@ io.on("connection", function (socket) {
 
                 userRoomsLocalStorage.splice(i, 1);
 
+                 // send out active players
+                let listPlayers = [];
+                for (let userInfo in userRoomsLocalStorage) {
+                    if (userRoomsLocalStorage[userInfo].roomNum === user.roomNum){
+                        listPlayers.push(userRoomsLocalStorage[userInfo].username);
+                    }
+                }
+                console.log(listPlayers);
                 console.log("deleted user ");
             }
         }
