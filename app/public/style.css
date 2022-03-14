@@ -76,7 +76,13 @@
 	background-color: #2292A4;
 	text-align: center;
 }
-
+.difficultyspace{
+	border: none;
+	width: 501px;
+	height: 50px;
+	background-color: #2292A4;
+	text-align: center;
+}
 .blankLetter{
 	padding: 5px 5px;
 	font-size: 30px;
