@@ -19,6 +19,10 @@ function getCookie(cname) {
 }
 
 let userText = document.getElementById("user");
+let gamesPlayedText = document.getElementById("gamesPlayed");
+let gamesWonText = document.getElementById("gamesWon");
+let highScoreText = document.getElementById("highScore");
+let totalpointsText = document.getElementById("totalPoints");
 
 console.log(getCookie("username"));
 userText.textContent = getCookie("username");
