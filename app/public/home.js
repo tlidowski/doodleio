@@ -18,11 +18,35 @@ newGameButton.onclick = function() {
 
 ADD YOUR CLIENT-SIDE CODE FOR add.html HERE
 */
+document.cookie = "";
 
+function setCookie(value) {
+    const d = new Date();
+    d.setTime(d.getTime() + (24*60*60*1000));
+    let exp = d.toUTCString();
+    document.cookie = "username=" + value + ";expires=" + exp + ";path=/";
+}
+
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
 
 let isSignedIn = false
 let usernameInput = document.getElementById("username");
 let passwordInput = document.getElementById("password");
+
 document.getElementById("logIn").addEventListener("click", function () {
 	fetch("/auth", {
 		method: "POST",
@@ -36,18 +60,20 @@ document.getElementById("logIn").addEventListener("click", function () {
 	}).then(function (response) {
 		if (response.status === 200) {
 			console.log("Successful Login");
-			alert("You're In!")
-			isSignedIn = true
-			accountStatus(isSignedIn)
+			alert("You're In!");
+			isSignedIn = true;
+			accountStatus(isSignedIn);
+			setCookie(usernameInput.value);
 		} else {
 			console.log("Failed Login");
 			alert("Something went wrong...")
 		}
 	});
 });
+
 document.getElementById("signUp").addEventListener("click", function () {
-	alert("CLICK")
-	console.log("CLICKED")
+	alert("CLICK");
+	console.log("CLICKED");
 	fetch("/user", {
 		method: "POST",
 		headers: {
@@ -59,10 +85,12 @@ document.getElementById("signUp").addEventListener("click", function () {
 		})
 	}).then(function (response) {
 		if (response.status === 200) {
-			alert("Account Created Successfully.")
-			alert("Signing You In...") ///To-do: Hook Up Login Auto
+			alert("Account Created Successfully.");
+			alert("Signing You In...");
 			console.log("Successful New Account");
-			
+			isSignedIn = true;
+			accountStatus(isSignedIn);
+			setCookie(usernameInput.value);
 		} else if (response.status === 401) {
 			alert("Username must be 1-20 characters and Password must be 5-36 characters.")
 			console.log("Failed New Account");
@@ -92,6 +120,8 @@ function accountStatus(signInStatus) {
 		signUpButton.setAttribute("hidden", "hidden")
 		signOutButton.removeAttribute("hidden")
 		accountInfoButton.removeAttribute("hidden")
+		accountInfoButton.textContent = getCookie("username");
+		console.log(getCookie("username"));
 		newGameButton.classList.replace('button-disabled', 'button')
 		joinGameButton.classList.replace('button-disabled', 'button')
 	} else {
