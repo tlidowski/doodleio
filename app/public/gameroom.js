@@ -61,6 +61,7 @@ let activePlayers = []; //list that holds username:points pairs.
 let currentTurn = 1;
 let roundsLeft = 3;
 
+
 // Cookies
 function getCookie(cname) {
     let name = cname + "=";
@@ -76,7 +77,9 @@ function getCookie(cname) {
       }
     }
     return "";
-  }
+}
+
+let revealsLeft;
 
 socket.emit("joinRoom", { username: getCookie("username"), roomNum: params.get("roomId") });
 
@@ -228,7 +231,7 @@ doodleBox.addEventListener("mousemove", emitDraw);
 
 newWordButton.addEventListener("click", function () {
     clearWordSpace();
-    chosenWord = pickAWord();
+    currentWord= chosenWord;
     console.log(chosenWord);
     letterList = chosenWord.split("");
     console.log(letterList);
@@ -243,6 +246,15 @@ newWordButton.addEventListener("click", function () {
         }
         wordBox.append(box);
     }
+    revealsLeft=letterList;
+    setInterval(randomReveal, 6000/revealsLeft.length);
+    function randomReveal() {
+	let position = Math.floor(Math.random() * revealsLeft.length);
+	let letter = revealsLeft[position];
+	wordBox.children[position].textContent=letter;
+	revealsLeft.splice(position);
+    }
+    
 });
 
 function clearWordSpace() {
@@ -307,5 +319,6 @@ function gameFlow() {
 
     
     currentTurn += 1;
+    
 
 }
