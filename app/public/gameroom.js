@@ -32,6 +32,11 @@ let easyWords = [
     "happy",
 ];
 
+let urlString = window.location.search;
+let params = new URLSearchParams(urlString);
+
+console.log(params.get("roomId"));
+
 //Current Default; Change When Artist Characteristic is Accessible
 let isArtist = false;
 
@@ -60,7 +65,7 @@ let lastSentf;
 let playingUsers = {}; //object that holds username:points pairs.
 let roundNumber;
 
-socket.emit("joinRoom", { username: "kyle", roomNum: "A" });
+socket.emit("joinRoom", { username: "kyle", roomNum: params.get("roomId") });
 
 function countDown() {
     timerBox.textContent = `Time Remaining: ${seconds}`;
