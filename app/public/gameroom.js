@@ -202,7 +202,6 @@ socket.on("draw", function (data) {
         data.strokeColor
     );
 });
-
 // size of canvas
 doodleBox.width = 350;
 doodleBox.height = 400;
@@ -259,11 +258,23 @@ doodleBox.addEventListener("mousemove", emitDraw);
 //Generate Word Space
 
 newWordButton.addEventListener("click", function () {
-    clearWordSpace();
-    currentWord= chosenWord;
+    let chosenWord = "elephant" //pickAWord("easy");
     console.log(chosenWord);
-    letterList = chosenWord.split("");
+    let letterList = chosenWord.split("");
     console.log(letterList);
+    let pickedIndices = []
+    updateWordBox(letterList, pickedIndices);
+
+    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*testSpeed*.5)
+    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*testSpeed*.75)
+    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*testSpeed*.9)
+
+
+});
+
+function updateWordBox(letterList, pickedIndices) {
+    clearWordSpace();
+    console.log(pickedIndices)
     for (letterIndex in letterList) {
         box = document.createElement("td");
         box.classList.add("blankLetter");
@@ -271,20 +282,29 @@ newWordButton.addEventListener("click", function () {
             //ShowWord
             box.textContent = letterList[letterIndex];
         } else {
-            box.textContent = "_"; //change: create a function to reveal a random character at 30, 10 seconds
+            if (pickedIndices.includes(parseInt(letterIndex))) {
+                box.textContent = letterList[letterIndex]
+            } else {
+                box.textContent = "_"; //change: create a function to reveal a random character at 30, 10 seconds
+            }
         }
         wordBox.append(box);
     }
-    revealsLeft=letterList;
-    setInterval(randomReveal, 6000/revealsLeft.length);
-    function randomReveal() {
-	let position = Math.floor(Math.random() * revealsLeft.length);
-	let letter = revealsLeft[position];
-	wordBox.children[position].textContent=letter;
-	revealsLeft.splice(position);
+}
+
+function revealLetter(letterList, pickedIndices){
+    let revealed = false
+    while (!revealed){
+        let position = Math.floor(Math.random() * letterList.length);
+        if (!pickedIndices.includes(position)){
+            pickedIndices.push(position)
+            revealed = true
+            updateWordBox(letterList, pickedIndices)
+        }else {
+        }
     }
-    
-});
+}
+
 
 function clearWordSpace() {
     wordBox.innerHTML = "";
