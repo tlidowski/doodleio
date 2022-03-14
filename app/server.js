@@ -102,6 +102,7 @@ io.on("connection", function (socket) {
             let numPlayers = await selectFrom('numplayers','rooms', `WHERE roomid = $1`, [user.roomNum]); 
 
             if (numPlayers >= 4) {
+                console.log("Room is full!");
                 pool.query('UPDATE rooms SET isplaying = TRUE where roomid = $1', [user.roomNum])
                 .catch(function(error){
                      return -1;
@@ -146,6 +147,15 @@ io.on("connection", function (socket) {
                 .then(function(response){
                     //console.log(response); // switch to async.
                  });
+
+                 let numPlayers = await selectFrom('numplayers','rooms', `WHERE roomid = $1`, [user.roomNum]); 
+
+                if (numPlayers <= 0) {
+                    pool.query('UPDATE rooms SET isAvailable = TRUE where roomid = $1', [user.roomNum])
+                        .catch(function(error){
+                            return -1;
+                    }); 
+            }
 
                 userRoomsLocalStorage.splice(i, 1);
 
