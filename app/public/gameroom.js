@@ -24,13 +24,7 @@ let colors = [
     "#737373",
 ];
 let testSpeed = 1000; //Keep default at 1000 for timer
-let easyWords = [
-    //Put into .txt and import? Or from Database
-    "dog",
-    "cat",
-    "elephant",
-    "happy",
-];
+let easyWords = [];
 
 let urlString = window.location.search;
 let params = new URLSearchParams(urlString);
@@ -234,7 +228,7 @@ doodleBox.addEventListener("mousemove", emitDraw);
 
 newWordButton.addEventListener("click", function () {
     clearWordSpace();
-    chosenWord = pickAWord(easyWords);
+    chosenWord = pickAWord();
     console.log(chosenWord);
     letterList = chosenWord.split("");
     console.log(letterList);
@@ -255,10 +249,23 @@ function clearWordSpace() {
     wordBox.innerHTML = "";
 }
 
-function pickAWord(wordList) {
-    //To be changed to connect to database
-    let numWords = wordList.length;
-    let pickedWord = wordList[Math.floor(Math.random() * numWords)];
+function pickAWord(difficulty) {
+    let wordIndex; 
+    if (difficulty == "easy") {
+        wordIndex = Math.floor(Math.random() * (20)) + 1;
+    } else if (difficulty == "medium") {
+        wordIndex = Math.floor(Math.random() * (40 - 20)) + 21;
+    } else if (difficulty == "hard") {
+        wordIndex = Math.floor(Math.random() * (60 - 20)) + 21;
+    } else if (difficulty == "expert") {
+        wordIndex = Math.floor(Math.random() * (80 - 20)) + 21;
+    } else {
+        return "";
+    }
+    let pickedWord = pool.query('SELECT * FROM wordList WHERE wordID = $1', [wordIndex])
+        .catch(function(error){
+            return res.sendStatus(500);
+    });
     return pickedWord;
 }
 
