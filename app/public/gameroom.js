@@ -41,9 +41,6 @@ roomCodeSpace.textContent = `${params.get("roomId")}`
 //Current Default; Change When Artist Characteristic is Accessible
 let isArtist = false;
 
-//Word Box
-let wordBox = document.getElementById("underscore-space");
-
 let newWordButton = document.getElementById("newWordButton");
 //Guess Box
 let guess;
@@ -263,13 +260,11 @@ selectedDiffBox.textContent = `Selected Difficulty: ${selectedDiff.toUpperCase()
 
 easyWordButton.addEventListener("click", function () {
     selectedDiff = "easy";
-    console.log(selectedDiff);
     selectedDiffBox.textContent = `Selected Difficulty: ${selectedDiff.toUpperCase()}`
 });
 
 medWordButton.addEventListener("click", function () {
     selectedDiff = "medium";
-    console.log(selectedDiff);
     selectedDiffBox.textContent = `Selected Difficulty: ${selectedDiff.toUpperCase()}`
 });
 
@@ -323,28 +318,24 @@ socket.on("wordSent", function (data) {
 function updateWordBox(letterList, pickedIndices) {//Updates wordbox for artist or guesser
     console.log("Here comes the word!")
     clearWordSpace()
-    console.log(`Revealed Letters: ${pickedIndices}`)
     console.log(`${isArtist} ${letterList}`)
+    let wordContent = ""
     for (letterIndex in letterList) {
-        box = document.createElement("td");
-        box.classList.add("blankLetter");
-        if (isArtist) {
-            //ShowWord
-            box.textContent = letterList[letterIndex];
+        if (isArtist){
+            wordContent+=`${(letterList[letterIndex])}`
         } else {
             if (pickedIndices.includes(parseInt(letterIndex))) {
-                box.textContent = letterList[letterIndex]
+                wordContent+= `${letterList[letterIndex]} `
             } else {
-                box.textContent = "_"; //change: create a function to reveal a random character at 30, 10 seconds
+                wordContent+="_ "; //change: create a function to reveal a random character at 30, 10 seconds
             }
+            console.log(`WordContent is ${wordContent}`)
         }
-        console.log(`Box content: ${box.textContent}`)
-        wordBox.append(box);
+       wordSpace.textContent = wordContent
     }
 }
 
 function updateWordBoxGuesser (letterList, pickedIndices){//calls revealLetter 3 times for guesser (CANNOT CALL IN UWB func)
-    console.log("Gonna reveal some cool shit")
     setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.5)
     setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.75)
     setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.9)
@@ -358,16 +349,14 @@ function revealLetter(letterList, pickedIndices){ //reveals letters
             pickedIndices.push(position)
             revealed = true
             updateWordBox(letterList, pickedIndices)
-        }else {
+        } else {
         }
     }
 }
 
 
 function clearWordSpace() { //empties the wordBox
-    while(wordBox.firstElementChild){
-        wordBox.removeChild(wordBox.firstElementChild);
-    }
+    wordSpace.textContent = ""
     console.log("Clearning box")
 }
 let headerTable = document.getElementById("game-header-table")
@@ -403,7 +392,7 @@ function wordSelectCountdown() {//updates timer in word box, hides diffTable, an
         },
         5*milliPerSec);
     } else {
-        wordBox.textContent = ''
+        wordSpace.textContent = ''
     }
 }
 
@@ -411,19 +400,23 @@ function updateWordTime(seconds, isArtist) { //updates timer in word box
     if (isArtist){
         wordCountdown.textContent = `Confirm Word Difficulty in: ${seconds}`;
     } else {
-        wordBox.textContent = `Start Guessing in: ${seconds}`;
+        wordSpace.textContent = `Start Guessing in: ${seconds}`;
     }
 }
 
 let userGuess = document.getElementById("wordguess")
 userGuess.addEventListener('keyup', function(event) {//allows submission in guessbox
-    console.log(event.code)
     if (event.code === 'Enter') {
         event.preventDefault()
         let lastGuess = userGuess.value
         if (lastGuess == chosenWord){ //correct guess
             guessTable.setAttribute("hidden","hidden") //hide guessBox
-            //update score
+            let score = 0
+            if (turnGuesses.length < 2) {
+                let score = 20 - 5*turnGuesses.length
+            } else {
+                let score = 5
+            }//update score
         } else {
             turnGuesses.push(lastGuess) //add guess to turnGuess
             //update turnGuess box
@@ -516,15 +509,14 @@ function doodlioTurn(){
     
     if (activePlayers[turn-1] === getCookie("username")) { //user is artist
         console.log(activePlayers[turn-1] + " is artist!");
-        console.log("You're an artist this turn.")
+        console.log("ALERT: You're an artist this turn.")
         isArtist = true;
     } else { //user is guesser
-        console.log("You're guessing this turn.")
+        console.log("ALERT: You're guessing this turn.")
         isArtist = false;
     }
     wordSelectCountdown()
     if (!isArtist){//find chosen word
-        console.log("Finding secret word...")
         setTimeout(function () {}, 5*milliPerSec);
         setTimeout(function() {
             let letterList = chosenWord.split("")
