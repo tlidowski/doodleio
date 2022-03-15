@@ -42,6 +42,21 @@
 
 		</tr>
 	</table>
+	<table id = "difficulty-table" class="difficultyspace" hidden>
+		<tr id="selectedDiff" style="text-align: center;"></tr>
+		<tr>
+			<td id="wordDiffCountdown">
+				Confirm Word Difficulty in: 5
+			</td>
+			<td>
+				<button id="easyWord" style="background-color: green; border-radius: 8px;">Easy</button> 
+				<button id="medWord" style="background-color: yellow; border-radius: 8px;">Medium</button>
+				<button id="hardWord" style="background-color: orange; border-radius: 8px;">Hard</button>
+				<button id="exWord" style="background-color: red; border-radius: 8px;">Expert</button>
+				<button id="randWord" style="background-color: purple; border-radius: 8px;">Random</button>
+			</td>
+		</tr>
+	</table>
 	<table id="canvas-player-table">
 		<tr>
 			<td>
@@ -90,20 +105,6 @@
 				<label name="wordguess" for="wordguess">Your Guess:</label>
 				<input type="text" id="wordguess">
 			</td>
-		</tr>
-	</table>
-	<table id = "difficulty-table" class="difficultyspace" hidden>
-		<tr>
-			<td>
-				<button id="easyWord" style="background-color: green; border-radius: 8px;">Easy</button> 
-				<button id="medWord" style="background-color: yellow; border-radius: 8px;">Medium</button>
-				<button id="hardWord" style="background-color: orange; border-radius: 8px;">Hard</button>
-				<button id="exWord" style="background-color: red; border-radius: 8px;">Expert</button>
-				<button id="randWord" style="background-color: purple; border-radius: 8px;">Random</button>
-			</td>
-		</tr>
-		<tr id="selected-difficulty">
-			<button id="confirmWordButton" hidden>Confirm Difficulty Choice</button>
 		</tr>
 	</table>
 </div>

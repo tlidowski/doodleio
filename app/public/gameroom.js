@@ -249,13 +249,14 @@ doodleBox.addEventListener("mousemove", emitDraw);
 
 
 //Generate Word Space
-let selectedDiff = "random";
+let selectedDiff = "easy";
 let easyWordButton = document.getElementById("easyWord");
 let medWordButton = document.getElementById("medWord");
 let hardWordButton = document.getElementById("hardWord");
 let exWordButton = document.getElementById("exWord");
 let randWordButton = document.getElementById("randWord");
-let selectedDiffBox = document.getElementById("selected-difficulty")
+let selectedDiffBox = document.getElementById("selectedDiff")
+selectedDiffBox.textContent = `Selected Difficulty: ${selectedDiff.toUpperCase()}`
 
 easyWordButton.addEventListener("click", function () {
     selectedDiff = "easy";
@@ -287,32 +288,30 @@ randWordButton.addEventListener("click", function () {
 
 let wordSpace = document.getElementById("word-space");
 
-newWordButton.addEventListener("click", function () {
-	fetch(`/gameroom?difficulty=${selectedDiff}`).then(function (response) {
-		if (response.status === 200) {
-			return response.json();
-		} else {
-			throw Error(response.status);
-		}
-	}).then(function (response) {
-        if(response.word != ''){
-            wordSpace.textContent = response.word;
-            let chosenWord = response.word;
-            console.log(chosenWord);
+function findSelectedDifficulty() {fetch(`/gameroom?difficulty=${selectedDiff}`).then(function (response) {
+    if (response.status === 200) {
+        return response.json();
+    } else {
+        throw Error(response.status);
+    }
+}).then(function (response) {
+    if(response.word != ''){
+        wordSpace.textContent = response.word;
+        var chosenWord = response.word;
+        console.log(chosenWord);
 
-            let letterList = chosenWord.split("");
-            console.log(letterList);
-            let pickedIndices = []
-            updateWordBox(letterList, pickedIndices);
+        let letterList = chosenWord.split("");
+        console.log(letterList);
+        let pickedIndices = []
+        updateWordBox(letterList, pickedIndices);
 
-            setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.5)
-            setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.75)
-            setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.9)
-        }
-	}).catch(function (error) {
-		console.log(error);
-	});
-});
+        setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.5)
+        setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.75)
+        setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.9)
+    }
+}).catch(function (error) {
+    console.log(error);
+});}
 
 function updateWordBox(letterList, pickedIndices) {
     clearWordSpace();
@@ -355,20 +354,37 @@ let headerTable = document.getElementById("game-header-table")
 let toolTable = document.getElementById("tool-select-table")
 let guessTable = document.getElementById("guess-table")
 let difficultyTable = document.getElementById("difficulty-table")
-let confirmWordButton = document.getElementById("confirmWordButton")
+let wordCountdown = document.getElementById("wordDiffCountdown")
+
 
 function tableHide(isArtist) { 
     if (isArtist){
         difficultyTable.removeAttribute("hidden")
         guessTable.setAttribute("hidden","hidden")
-        confirmWordButton.setAttribute("hidden", "hidden")
     } else { //is Guesser
         difficultyTable.setAttribute("hidden","hidden")
         guessTable.removeAttribute("hidden")
-        confirmWordButton.removeAttribute("hidden")
     }
 }
 
+function wordSelectCountdown() {
+    let wordSelectSeconds = 5
+    setTimeout(function() {updateWordTime(4)}, 1*milliPerSec)
+    setTimeout(function() {updateWordTime(3)}, 2*milliPerSec)
+    setTimeout(function() {updateWordTime(2)}, 3*milliPerSec)
+    setTimeout(function() {updateWordTime(1)}, 4*milliPerSec)
+    setTimeout(function() {
+        difficultyTable.setAttribute("hidden", "hidden")
+        findSelectedDifficulty()
+        clearInterval(wordInterval);}, 
+    5*milliPerSec)
+    
+}
+
+function updateWordTime(seconds) {
+    wordCountdown.textContent = `Confirm Word Difficulty in: ${seconds}`;
+}
+let userGuess = document.getElementById("wordguess")
 // function pickAWord(difficulty) {
 //     return pickedWord;
 // }
@@ -426,6 +442,7 @@ function doodlioTurn(){
         if (activePlayers[turn-1] === getCookie("username")) {
             console.log(activePlayers[turn-1] + " is artist!");
             isArtist = true;
+            wordSelectCountdown()
         } else {
             isArtist = false;
         }
@@ -433,7 +450,7 @@ function doodlioTurn(){
         ctx.clearRect(0, 0, doodleBox.width, doodleBox.height);
 
         turnSeconds = 60*(milliPerSec/1000);
-        countdownInterval = setInterval(countDown, milliPerSec);
+        setTimeout(function() {countdownInterval = setInterval(countDown, milliPerSec)}, 4000) //Wait for wordSelect to end timer
 
     
 }
