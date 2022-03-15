@@ -397,7 +397,7 @@ let userGuess = document.getElementById("wordguess")
 
 //syncing clocks
 socket.on("startClock", function (data) {
-
+    startButton.setAttribute("hidden", true);
     isPlaying = true;
 
     for (userIdx = 0; userIdx < activePlayers.length; userIdx++) {
@@ -452,7 +452,7 @@ socket.on("activePlayers", function (data) {
                 turnSeconds = 0;
             }
         } 
-        
+
         console.log(playerInfo);
     }
     
