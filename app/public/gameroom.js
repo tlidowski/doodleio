@@ -23,7 +23,7 @@ let colors = [
     "#492b16",
     "#737373",
 ];
-let milliPerSec = 1000; //Keep default at 1000 for timer
+let milliPerSec = 100; //Keep default at 1000 for timer
 let easyWords = [];
 
 let urlString = window.location.search;
@@ -533,5 +533,22 @@ function doodlioTurn(){
 }
 
 function userStatUpdate () {
-    //will add to this
+    // find winner;
+
+    for (let s = 0; s < playerInfo.length; s++){
+        if (playerInfo[s].active) {
+
+          
+        }
+    }
+
+    let urlHS = "/highscore?username=" + getCookie("username");
+            
+    fetch(urlHS).then(function (response) {
+        return response.json();
+    }).then(function (data) {
+       console.log("highscore? : " + data.highscore);
+    });
+
+    //let data = {username: getCookie("username"), points: playerInfo.points};
 }
