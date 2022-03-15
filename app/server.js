@@ -92,7 +92,7 @@ io.on("connection", function (socket) {
 
             //update rooms
             pool.query(
-                "UPDATE rooms SET numplayers = numplayers + 1 where roomid = $1",
+                "UPDATE rooms SET numplayers = numplayers + 1, isAvailable = false where roomid = $1",
                 [user.roomNum]
             ).catch(function (error) {
                 return -1;
@@ -366,6 +366,18 @@ app.get("/gameStart", function (req, res) {
     }).catch(function(response) {
         res.status(500).send();
     });
+});
+
+app.get("/highscore", function (req, res) {
+    let userForHS = req.query["username"];
+    pool.query("SELECT highscore FROM users WHERE username = $1", [userForHS])
+        .then(function (response) {
+            console.log(response.rows[0].highscore);
+            return res.json({ highscore : response.rows[0].highscore});
+        })
+        .catch(function (error) {
+            return res.sendStatus(500);
+        });
 });
 
 app.post("/auth", function (req, res) {
