@@ -90,6 +90,14 @@ io.on("connection", function (socket) {
 
             socket.join(user.roomNum);
 
+            //update rooms
+            pool.query(
+                "UPDATE rooms SET numplayers = numplayers + 1 where roomid = $1",
+                [user.roomNum]
+            ).catch(function (error) {
+                return -1;
+            });
+
             // check amount of people in room
             let numPlayers = await selectFrom(
                 "numplayers",
@@ -143,10 +151,13 @@ io.on("connection", function (socket) {
 
     socket.on("disconnect", async function () {
         console.log("user disconnected");
+        let room;
 
         for (let i = 0; i < userRoomsLocalStorage.length; i++) {
             let user = userRoomsLocalStorage[i];
             if (user.id === socket.id) {
+                room = user.roomNum;
+
                 //update users
                 pool.query("UPDATE users SET roomid = $1 where username = $2", [
                     "blank",
@@ -159,8 +170,8 @@ io.on("connection", function (socket) {
                 pool.query(
                     "UPDATE rooms SET numplayers = numplayers - 1 where roomid = $1",
                     [user.roomNum]
-                ).then(function (response) {
-                    //console.log(response); // switch to async.
+                ).catch(function (error) {
+                    return -1;
                 });
 
                 let numPlayers = await selectFrom(
@@ -181,18 +192,17 @@ io.on("connection", function (socket) {
 
                 userRoomsLocalStorage.splice(i, 1);
 
-                // send out active players
                 let listPlayers = [];
                 for (let userInfo in userRoomsLocalStorage) {
-                    if (
-                        userRoomsLocalStorage[userInfo].roomNum === user.roomNum
-                    ) {
+                    if (userRoomsLocalStorage[userInfo].roomNum === room) {
                         listPlayers.push(
                             userRoomsLocalStorage[userInfo].username
                         );
                     }
                 }
-                console.log(listPlayers);
+                io.in(user.roomNum).emit("activePlayers", {
+                    activePlayers: listPlayers,
+                });
                 console.log("deleted user ");
             }
         }
@@ -209,6 +219,29 @@ app.get("/guess", function (req, res) {
         //User is a guesser who has not guessed yet
     } else {
         //Don't allow a guess
+    }
+});
+
+let validDifficulty = ["easy", "medium", "hard", "expert"];
+app.get("/gameroom", async function (req, res) {
+    let diff = req.query["difficulty"];
+    if (!validDifficulty.includes(diff)) {
+        console
+            .log("Not a valid difficulty level")
+            .then(function (response) {
+                return res.json();
+            })
+            .catch(function (error) {
+                return res.sendStatus(500);
+            });
+    } else {
+        let respWord = await selectFrom(
+            "word",
+            "words",
+            `WHERE difficulty = $1 ORDER BY RANDOM() LIMIT 1`,
+            [diff]
+        );
+        return res.json({ word: respWord });
     }
 });
 

@@ -110,7 +110,7 @@ function countDown() {
         timerBox.textContent = "Turn Over";
         clearInterval(countdownInterval);
 
-        if (turn === activePlayers.length) {
+        if (turn >= activePlayers.length) {
             turn = 1;
             roundsLeft -= 1;
         } else {
@@ -249,19 +249,66 @@ doodleBox.addEventListener("mousemove", emitDraw);
 
 //Generate Word Space
 
+let selectedDiff = "random";
+let easyWordButton = document.getElementById("easyWord");
+let medWordButton = document.getElementById("medWord");
+let hardWordButton = document.getElementById("hardWord");
+let exWordButton = document.getElementById("exWord");
+let randWordButton = document.getElementById("randWord");
+
+easyWordButton.addEventListener("click", function () {
+    selectedDiff = "easy";
+    console.log(selectedDiff);
+});
+
+medWordButton.addEventListener("click", function () {
+    selectedDiff = "medium";
+    console.log(selectedDiff);
+});
+
+hardWordButton.addEventListener("click", function () {
+    selectedDiff = "hard";
+    console.log(selectedDiff);
+});
+
+exWordButton.addEventListener("click", function () {
+    selectedDiff = "expert";
+    console.log(selectedDiff);
+});
+
+randWordButton.addEventListener("click", function () {
+    selectedDiff = "random";
+    console.log(selectedDiff);
+});
+
+
+let wordSpace = document.getElementById("word-space");
+
 newWordButton.addEventListener("click", function () {
-    let chosenWord = "elephant" //pickAWord("easy");
-    console.log(chosenWord);
-    let letterList = chosenWord.split("");
-    console.log(letterList);
-    let pickedIndices = []
-    updateWordBox(letterList, pickedIndices);
+	fetch(`/gameroom?difficulty=${selectedDiff}`).then(function (response) {
+		if (response.status === 200) {
+			return response.json();
+		} else {
+			throw Error(response.status);
+		}
+	}).then(function (response) {
+        if(response.word != ''){
+            wordSpace.textContent = response.word;
+            let chosenWord = response.word;
+            console.log(chosenWord);
 
-    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.5)
-    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.75)
-    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.9)
+            let letterList = chosenWord.split("");
+            console.log(letterList);
+            let pickedIndices = []
+            updateWordBox(letterList, pickedIndices);
 
-
+            setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.5)
+            setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.75)
+            setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.9)
+        }
+	}).catch(function (error) {
+		console.log(error);
+	});
 });
 
 function updateWordBox(letterList, pickedIndices) {
@@ -302,25 +349,9 @@ function clearWordSpace() {
     wordBox.innerHTML = "";
 }
 
-function pickAWord(difficulty) {
-    let wordIndex; 
-    if (difficulty == "easy") {
-        wordIndex = Math.floor(Math.random() * (20)) + 1;
-    } else if (difficulty == "medium") {
-        wordIndex = Math.floor(Math.random() * (40 - 20)) + 21;
-    } else if (difficulty == "hard") {
-        wordIndex = Math.floor(Math.random() * (60 - 20)) + 21;
-    } else if (difficulty == "expert") {
-        wordIndex = Math.floor(Math.random() * (80 - 20)) + 21;
-    } else {
-        return "";
-    }
-    let pickedWord = pool.query('SELECT * FROM wordList WHERE wordID = $1', [wordIndex])
-        .catch(function(error){
-            return res.sendStatus(500);
-    });
-    return pickedWord;
-}
+// function pickAWord(difficulty) {
+//     return pickedWord;
+// }
 
 //LeaderBoard Box
 
