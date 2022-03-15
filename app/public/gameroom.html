@@ -84,9 +84,9 @@
 			</td>
 		</tr>
 	</table>
-	<table id = "guess-table">
+	<table id = "guess-table" hidden>
 		<tr>
-			<td id="guess-space" class="guessspace" hidden>
+			<td id="guess-space" class="guessspace">
 				<label name="wordguess" for="wordguess">Your Guess:</label>
 				<input type="text" id="wordguess">
 			</td>
@@ -101,6 +101,9 @@
 				<button id="exWord" style="background-color: red; border-radius: 8px;">Expert</button>
 				<button id="randWord" style="background-color: purple; border-radius: 8px;">Random</button>
 			</td>
+		</tr>
+		<tr id="selected-difficulty">
+			<button id="confirmWordButton">Confirm Difficulty Choice</button>
 		</tr>
 
 	</table>

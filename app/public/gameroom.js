@@ -248,37 +248,39 @@ doodleBox.addEventListener("mousemove", emitDraw);
 
 
 //Generate Word Space
-
 let selectedDiff = "random";
 let easyWordButton = document.getElementById("easyWord");
 let medWordButton = document.getElementById("medWord");
 let hardWordButton = document.getElementById("hardWord");
 let exWordButton = document.getElementById("exWord");
 let randWordButton = document.getElementById("randWord");
+let selectedDiffBox = document.getElementById("selected-difficulty")
 
 easyWordButton.addEventListener("click", function () {
     selectedDiff = "easy";
     console.log(selectedDiff);
+    selectedDiffBox.textContent = `Selected Difficulty: ${selectedDiff.toUpperCase()}`
 });
 
 medWordButton.addEventListener("click", function () {
     selectedDiff = "medium";
     console.log(selectedDiff);
+    selectedDiffBox.textContent = `Selected Difficulty: ${selectedDiff.toUpperCase()}`
 });
 
 hardWordButton.addEventListener("click", function () {
     selectedDiff = "hard";
-    console.log(selectedDiff);
+    selectedDiffBox.textContent = `Selected Difficulty: ${selectedDiff.toUpperCase()}`
 });
 
 exWordButton.addEventListener("click", function () {
     selectedDiff = "expert";
-    console.log(selectedDiff);
+    selectedDiffBox.textContent = `Selected Difficulty: ${selectedDiff.toUpperCase()}`
 });
 
 randWordButton.addEventListener("click", function () {
     selectedDiff = "random";
-    console.log(selectedDiff);
+    selectedDiffBox.textContent = `Selected Difficulty: ${selectedDiff.toUpperCase()}`
 });
 
 
@@ -348,6 +350,20 @@ function revealLetter(letterList, pickedIndices){
 function clearWordSpace() {
     wordBox.innerHTML = "";
 }
+let headerTable = document.getElementById("game-header-table")
+let toolTable = document.getElementById("tool-select-table")
+let guessTable = document.getElementById("guess-table")
+let difficultyTable = document.getElementById("difficulty-table")
+
+function tableHide(isArtist) { 
+    if (isArtist){
+        difficultyTable.removeAttribute("hidden")
+        guessTable.setAttribute("hidden","hidden")
+    } else { //is Guesser
+        difficultyTable.setAttribute("hidden","hidden")
+        guessTable.removeAttribute("hidden")
+    }
+}
 
 // function pickAWord(difficulty) {
 //     return pickedWord;
@@ -366,12 +382,8 @@ startButton.addEventListener("click", function() {
     socket.emit("pressedStart", {roomNum: params.get("roomId")});
 })
 
-function gameStartUnHide() {
-    let headerTable = document.getElementById("game-header-table")
-    let toolTable = document.getElementById("tool-select-table")
-    let guessTable = document.getElementById("guess-table")
-    let difficultyTable = document.getElementById("difficulty-table")
-}
+
+
 //get list of players
 
 socket.on("activePlayers", function (data) {
@@ -382,6 +394,7 @@ socket.on("activePlayers", function (data) {
 
 
 function doodlioTurn(){
+        headerTable.removeAttribute("hidden")
         turnSpace.textContent = `Turn: ${turn}`
         roundSpace.textContent = `Round: ${(3-roundsLeft) + 1}`
         artistSpace.textContent = `Artist: ${activePlayers[turn-1]}`
@@ -395,6 +408,7 @@ function doodlioTurn(){
         } else {
             isArtist = false;
         }
+        tableHide(isArtist)
         ctx.clearRect(0, 0, doodleBox.width, doodleBox.height);
 
         turnSeconds = 60*(milliPerSec/1000);
