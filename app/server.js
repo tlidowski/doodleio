@@ -237,13 +237,9 @@ app.get("/gameroom", async function (req, res) {
     let diff = req.query["difficulty"];
     if (!validDifficulty.includes(diff)) {
         console
-            .log("Not a valid difficulty level")
-            .then(function (response) {
-                return res.json();
-            })
-            .catch(function (error) {
-                return res.sendStatus(500);
-            });
+            .log("Not a valid difficulty level");
+            
+        return res.send().status(500);
     } else {
         let respWord = await selectFrom(
             "word",
