@@ -4,8 +4,8 @@
 1. Add password to env.json
 2. Set up local database
 
-### Adding Postgres Password
-In the env.json file, edit the password attribute ("password": "") and type in your own password in the quotation marks to allow access to your local Postgres login.
+### Adding PostgreSQL Password
+In the env.json file, edit the password attribute ("password": "") and type in your own password in the quotation marks to allow access to your local PostgreSQL login.
 ### Setting Up the Database
 ```psql --username postgres```
 
