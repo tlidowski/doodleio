@@ -291,7 +291,7 @@ randWordButton.addEventListener("click", function () {
 
 let wordSpace = document.getElementById("word-space");
 
-function findSelectedDifficulty() {fetch(`/gameroom?difficulty=${selectedDiff}`).then(function (response) {
+function findSelectedDifficulty() {fetch(`/gameroom?difficulty=${selectedDiff}`).then(function (response) { //artist only; finds word
     if (response.status === 200) {
         return response.json();
     } else {
@@ -317,12 +317,14 @@ function findSelectedDifficulty() {fetch(`/gameroom?difficulty=${selectedDiff}`)
 
 socket.on("wordSent", function (data) {
     chosenWord = data.chosenWord; 
-    console.log(chosenWord);
+    console.log(`Chosen Word is: ${chosenWord}`);
 });
 
-function updateWordBox(letterList, pickedIndices) {
-    clearWordSpace();
-    console.log(pickedIndices)
+function updateWordBox(letterList, pickedIndices) {//Updates wordbox for artist or guesser
+    console.log("Here comes the word!")
+    clearWordSpace()
+    console.log(`Revealed Letters: ${pickedIndices}`)
+    console.log(`${isArtist} ${letterList}`)
     for (letterIndex in letterList) {
         box = document.createElement("td");
         box.classList.add("blankLetter");
@@ -336,19 +338,19 @@ function updateWordBox(letterList, pickedIndices) {
                 box.textContent = "_"; //change: create a function to reveal a random character at 30, 10 seconds
             }
         }
+        console.log(`Box content: ${box.textContent}`)
         wordBox.append(box);
     }
-
-    
 }
 
-function updateWordBoxGuesser (letterList, pickedIndices){
+function updateWordBoxGuesser (letterList, pickedIndices){//calls revealLetter 3 times for guesser (CANNOT CALL IN UWB func)
+    console.log("Gonna reveal some cool shit")
     setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.5)
     setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.75)
     setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.9)
 }
 
-function revealLetter(letterList, pickedIndices){
+function revealLetter(letterList, pickedIndices){ //reveals letters
     let revealed = false
     while (!revealed){
         let position = Math.floor(Math.random() * letterList.length);
@@ -362,8 +364,11 @@ function revealLetter(letterList, pickedIndices){
 }
 
 
-function clearWordSpace() {
-    wordBox.innerHTML = "";
+function clearWordSpace() { //empties the wordBox
+    while(wordBox.firstElementChild){
+        wordBox.removeChild(wordBox.firstElementChild);
+    }
+    console.log("Clearning box")
 }
 let headerTable = document.getElementById("game-header-table")
 let toolTable = document.getElementById("tool-select-table")
@@ -372,7 +377,7 @@ let difficultyTable = document.getElementById("difficulty-table")
 let wordCountdown = document.getElementById("wordDiffCountdown")
 
 
-function tableHide(isArtist) { 
+function tableHide(isArtist) { //before turn start reset visibility
     if (isArtist){
         difficultyTable.removeAttribute("hidden")
         guessTable.setAttribute("hidden","hidden")
@@ -382,26 +387,36 @@ function tableHide(isArtist) {
     }
 }
 
-function wordSelectCountdown() {
-    let wordSelectSeconds = 5
-    setTimeout(function() {updateWordTime(4)}, 1*milliPerSec)
-    setTimeout(function() {updateWordTime(3)}, 2*milliPerSec)
-    setTimeout(function() {updateWordTime(2)}, 3*milliPerSec)
-    setTimeout(function() {updateWordTime(1)}, 4*milliPerSec)
-    setTimeout(function() {
-        difficultyTable.setAttribute("hidden", "hidden");
-        findSelectedDifficulty();
-      // clearInterval(wordInterval);
-    },
-    5*milliPerSec);
-    
+function wordSelectCountdown() {//updates timer in word box, hides diffTable, and selects word
+
+    setTimeout(function() {updateWordTime(4, isArtist)}, 1*milliPerSec)
+    setTimeout(function() {updateWordTime(3, isArtist)}, 2*milliPerSec)
+    setTimeout(function() {updateWordTime(2, isArtist)}, 3*milliPerSec)
+    setTimeout(function() {updateWordTime(1, isArtist)}, 4*milliPerSec)
+    clearWordSpace()
+    if (isArtist) {
+        setTimeout(function() {
+            difficultyTable.setAttribute("hidden", "hidden");
+            findSelectedDifficulty();
+          // clearInterval(wordInterval);
+          // TODO add ability to draw
+        },
+        5*milliPerSec);
+    } else {
+        wordBox.textContent = ''
+    }
 }
 
-function updateWordTime(seconds) {
-    wordCountdown.textContent = `Confirm Word Difficulty in: ${seconds}`;
+function updateWordTime(seconds, isArtist) { //updates timer in word box
+    if (isArtist){
+        wordCountdown.textContent = `Confirm Word Difficulty in: ${seconds}`;
+    } else {
+        wordBox.textContent = `Start Guessing in: ${seconds}`;
+    }
 }
+
 let userGuess = document.getElementById("wordguess")
-userGuess.addEventListener('keyup', function(event) {
+userGuess.addEventListener('keyup', function(event) {//allows submission in guessbox
     console.log(event.code)
     if (event.code === 'Enter') {
         event.preventDefault()
@@ -491,6 +506,7 @@ socket.on("activePlayers", function (data) {
 
 function doodlioTurn(){
     var turnGuesses = []
+    clearWordSpace();
     headerTable.removeAttribute("hidden")
     turnSpace.textContent = `Turn: ${turn}`
     roundSpace.textContent = `Round: ${(3-roundsLeft) + 1}`
@@ -500,17 +516,27 @@ function doodlioTurn(){
     
     if (activePlayers[turn-1] === getCookie("username")) { //user is artist
         console.log(activePlayers[turn-1] + " is artist!");
+        console.log("You're an artist this turn.")
         isArtist = true;
-        wordSelectCountdown()
     } else { //user is guesser
+        console.log("You're guessing this turn.")
         isArtist = false;
     }
-
+    wordSelectCountdown()
+    if (!isArtist){//find chosen word
+        console.log("Finding secret word...")
+        setTimeout(function () {}, 5*milliPerSec);
+        setTimeout(function() {
+            let letterList = chosenWord.split("")
+            updateWordBox(letterList, [])
+            updateWordBoxGuesser(letterList, [])
+        }, 6*milliPerSec)
+    }
     tableHide(isArtist)
     ctx.clearRect(0, 0, doodleBox.width, doodleBox.height);
 
     turnSeconds = 60*(milliPerSec/1000);
-    setTimeout(function() {countdownInterval = setInterval(countDown, milliPerSec)}, 4000) //Wait for wordSelect to end timer
+    setTimeout(function() {countdownInterval = setInterval(countDown, milliPerSec)}, 4*milliPerSec) //Wait for wordSelect to end timer
     
 }
 
