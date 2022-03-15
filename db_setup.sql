@@ -14,9 +14,7 @@ CREATE TABLE rooms(
     roomID VARCHAR(64) PRIMARY KEY, 
     isAvailable BOOLEAN, 
     isPlaying BOOLEAN, 
-    numPlayers INT,
-    roundNum INT, 
-    currentTurn INT);
+    numPlayers INT);
 
 INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('blank', true, false, 0, 0, 0);
 INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('WMJH', true, false, 0, 0, 1);
