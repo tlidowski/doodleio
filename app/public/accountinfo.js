@@ -1,7 +1,7 @@
-function setCookie(value) {
-    document.cookie = "username=" + value;
-}
-
+/* 
+  Get Cookie Function implemented from:
+  https://www.w3schools.com/js/js_cookies.asp
+*/
 function getCookie(cname) {
   let name = cname + "=";
   let decodedCookie = decodeURIComponent(document.cookie);
@@ -18,15 +18,16 @@ function getCookie(cname) {
   return "";
 }
 
+function setCookie(value) {
+  document.cookie = "username=" + value;
+}
+
+// Fetch Account Info and Updates Fields
 let userText = document.getElementById("user");
 let gamesPlayedText = document.getElementById("gamesPlayed");
 let gamesWonText = document.getElementById("gamesWon");
 let highScoreText = document.getElementById("highScore");
 let totalpointsText = document.getElementById("totalPoints");
-
-console.log(getCookie("username"));
-userText.textContent = getCookie("username");
-acctUpdate();
 
 function acctUpdate () {
   fetch("/numgames?username=" + getCookie("username")).then(function (response) {
@@ -57,3 +58,7 @@ function acctUpdate () {
     totalpointsText.textContent = "Overall Total Game Score: " + data.totalpoints;
   });
 }
+
+console.log(getCookie("username"));
+userText.textContent = getCookie("username");
+acctUpdate();
