@@ -388,6 +388,21 @@ function updateWordTime(seconds) {
     wordCountdown.textContent = `Confirm Word Difficulty in: ${seconds}`;
 }
 let userGuess = document.getElementById("wordguess")
+userGuess.addEventListener('keyup', function(event) {
+    console.log(event.code)
+    if (event.code === 'Enter') {
+        event.preventDefault()
+        let lastGuess = userGuess.value
+        if (lastGuess == chosenWord){ //correct guess
+            guessTable.setAttribute("hidden","hidden") //hide guessBox
+            //update score
+        } else {
+            turnGuesses.push(lastGuess) //add guess to turnGuess
+            //update turnGuess box
+        }
+        userGuess.value = ''
+    }
+})
 // function pickAWord(difficulty) {
 //     return pickedWord;
 // }
@@ -462,28 +477,27 @@ socket.on("activePlayers", function (data) {
 
 
 function doodlioTurn(){
-        headerTable.removeAttribute("hidden")
-        turnSpace.textContent = `Turn: ${turn}`
-        roundSpace.textContent = `Round: ${(3-roundsLeft) + 1}`
-        artistSpace.textContent = `Artist: ${activePlayers[turn-1]}`
-        console.log("CURRENT TURN: " + turn + " and Round: " + ((3-roundsLeft) + 1));
-        correctGuesses = 0;
+    var turnGuesses = []
+    headerTable.removeAttribute("hidden")
+    turnSpace.textContent = `Turn: ${turn}`
+    roundSpace.textContent = `Round: ${(3-roundsLeft) + 1}`
+    artistSpace.textContent = `Artist: ${activePlayers[turn-1]}`
+    console.log("CURRENT TURN: " + turn + " and Round: " + ((3-roundsLeft) + 1));
+    correctGuesses = 0;
+    
+    if (activePlayers[turn-1] === getCookie("username")) { //user is artist
+        console.log(activePlayers[turn-1] + " is artist!");
+        isArtist = true;
+        wordSelectCountdown()
+    } else { //user is guesser
+        isArtist = false;
+    }
 
+    tableHide(isArtist)
+    ctx.clearRect(0, 0, doodleBox.width, doodleBox.height);
 
-        if (activePlayers[turn-1] === getCookie("username")) {
-            console.log(activePlayers[turn-1] + " is artist!");
-            isArtist = true;
-            wordSelectCountdown()
-        } else {
-            isArtist = false;
-        }
-
-        tableHide(isArtist)
-        ctx.clearRect(0, 0, doodleBox.width, doodleBox.height);
-
-        turnSeconds = 60*(milliPerSec/1000);
-        setTimeout(function() {countdownInterval = setInterval(countDown, milliPerSec)}, 4000) //Wait for wordSelect to end timer
-
+    turnSeconds = 60*(milliPerSec/1000);
+    setTimeout(function() {countdownInterval = setInterval(countDown, milliPerSec)}, 4000) //Wait for wordSelect to end timer
     
 }
 
