@@ -106,7 +106,7 @@ io.on("connection", function (socket) {
                 [user.roomNum]
             );
 
-            if (numPlayers >= 4) {
+            /*if (numPlayers >= 4) {
                 console.log("Room is full!");
                 pool.query(
                     "UPDATE rooms SET isplaying = TRUE where roomid = $1",
@@ -114,7 +114,7 @@ io.on("connection", function (socket) {
                 ).catch(function (error) {
                     return -1;
                 }); //redirect --> home.html
-            }
+            }*/
 
             console.log(user.username + "joined " + user.roomNum);
 
@@ -314,7 +314,7 @@ app.post("/user", function (req, res) {
 
 app.get("/newRoomEntry", function (req, res) {
     pool.query(
-        "SELECT roomID FROM rooms WHERE isPlaying = FALSE AND isAvailable = TRUE"
+        "SELECT roomID FROM rooms WHERE isPlaying = FALSE AND isAvailable = TRUE AND NOT roomid = 'blank' "
     ).then(function (response) {
         let openRooms = JSON.stringify(response.rows);
         if (openRooms.length > 0) {
@@ -325,7 +325,31 @@ app.get("/newRoomEntry", function (req, res) {
             res.status(400);
         }
 
-        console.log("newRoomEntries: " + JSON.stringify(response.rows));
+        //console.log("newRoomEntries: " + JSON.stringify(response.rows));
+    });
+});
+
+
+app.get("/joinRoomEntryNumPlayers", async function (req, res) {
+    let room = req.query["roomCode"]
+    let numPlayersToJoin = await selectFrom("numplayers", "rooms", `WHERE roomid = $1`, [room]).then(function(numPlayersToJoin){
+        if (numPlayersToJoin  < 4) {
+            res.status(200);
+        } else {
+            res.status(400);
+        }
+    }).catch(function(error){
+        res.send().status(500);
+    });
+});
+
+
+app.get("/joinRoomEntryPlaying", async function (req, res) {
+    let room = req.query["roomCode"]
+    let numPlayersToJoin = await selectFrom("isPlaying", "rooms", `WHERE roomid = $1`, [room]).then(function(numPlayersToJoin){
+        console.log(isPlaying);
+    }).catch(function(error){
+        res.send().status(500);
     });
 });
 

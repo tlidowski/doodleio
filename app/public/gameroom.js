@@ -70,6 +70,7 @@ let activePlayers = []; //list that holds username:points pairs.
 let correctGuesses = 0;
 let turn = 1;
 let roundsLeft = 3;
+let isPlaying = false;
 
 
 // Cookies
@@ -120,6 +121,7 @@ function countDown() {
 
         if (roundsLeft <= 0) {
             timerBox.textContent = "Game Over!";
+            userStatUpdate();
         } else {
             cooldownSeconds = 5*(milliPerSec/1000);
             cooldownInterval = setInterval(coolDown, milliPerSec);
@@ -374,10 +376,11 @@ function wordSelectCountdown() {
     setTimeout(function() {updateWordTime(2)}, 3*milliPerSec)
     setTimeout(function() {updateWordTime(1)}, 4*milliPerSec)
     setTimeout(function() {
-        difficultyTable.setAttribute("hidden", "hidden")
-        findSelectedDifficulty()
-        clearInterval(wordInterval);}, 
-    5*milliPerSec)
+        difficultyTable.setAttribute("hidden", "hidden");
+        findSelectedDifficulty();
+      // clearInterval(wordInterval);
+    },
+    5*milliPerSec);
     
 }
 
@@ -395,6 +398,9 @@ let userGuess = document.getElementById("wordguess")
 
 //syncing clocks
 socket.on("startClock", function (data) {
+    startButton.setAttribute("hidden", true);
+    isPlaying = true;
+
     for (userIdx = 0; userIdx < activePlayers.length; userIdx++) {
         playerInfo.push({"username": activePlayers[userIdx], "active": true, "points": 0});
     }
@@ -426,6 +432,31 @@ startButton.addEventListener("click", function() {
 socket.on("activePlayers", function (data) {
     activePlayers = data.activePlayers;
     console.log(activePlayers);
+
+    if (isPlaying) {
+
+        let dropIdx = 0;
+
+        for (let j = 0; j < playerInfo.length; j++){
+            if (!activePlayers.includes(playerInfo[j].username)){
+                playerInfo[j].active = false;
+                dropIdx = j;
+                break;
+            }
+        }
+        
+        let currentTurn = turn - 1;
+
+        if (dropIdx <= currentTurn) { //if the dropped user is taking/already took their turn
+            turn -= 1;
+            if (dropIdx === currentTurn) { //if the dropped user is the current artist
+                turnSeconds = 0;
+            }
+        } 
+
+        console.log(playerInfo);
+    }
+    
 });
 
 
@@ -446,6 +477,7 @@ function doodlioTurn(){
         } else {
             isArtist = false;
         }
+
         tableHide(isArtist)
         ctx.clearRect(0, 0, doodleBox.width, doodleBox.height);
 
@@ -453,4 +485,8 @@ function doodlioTurn(){
         setTimeout(function() {countdownInterval = setInterval(countDown, milliPerSec)}, 4000) //Wait for wordSelect to end timer
 
     
+}
+
+function userStatUpdate () {
+    //will add to this
 }
