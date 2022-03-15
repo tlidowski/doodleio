@@ -366,7 +366,12 @@ startButton.addEventListener("click", function() {
     socket.emit("pressedStart", {roomNum: params.get("roomId")});
 })
 
-
+function gameStartUnHide() {
+    let headerTable = document.getElementById("game-header-table")
+    let toolTable = document.getElementById("tool-select-table")
+    let guessTable = document.getElementById("guess-table")
+    let difficultyTable = document.getElementById("difficulty-table")
+}
 //get list of players
 
 socket.on("activePlayers", function (data) {

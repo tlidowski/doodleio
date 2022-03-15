@@ -15,7 +15,7 @@
 <img src="img/doodlio-transparent.png" alt="Doodl.io Logo" class="logo">
 
 <div id="gameplay-area" class="gameplayarea">
-	<table>
+	<table id="game-header-table" hidden>
 		<tr>
 			<td id="round-space" class = "roundspace">
 				Round: 
@@ -31,7 +31,7 @@
 			</td>
 		</tr>
 	</table>
-	<table>
+	<table id="default-header-table">
 		<tr>
 			<td id="word-space" class = "wordspace">
 				<div id="underscore-space" style="text-align: center;"></div>
@@ -42,7 +42,7 @@
 
 		</tr>
 	</table>
-	<table>
+	<table id="canvas-player-table">
 		<tr>
 			<td>
 				<canvas id="drawing-board" class="drawingboard">
@@ -55,45 +55,44 @@
 			</td>
 		</tr>
 	</table>
-	<table style="background-color: #2292A4">
+	<table id="tool-select-table" style="background-color: #2292A4">
 		<tr id="styleRow">
-	  <td>
-		<div class="box" id="currentColor"></div>
-	  </td>
-	  <td>
-	  </td>
-	  <td>
-		<table>
-		  <tr id="firstColorRow">
-			
-		  </tr>
-		  <tr id="secondColorRow">
-			
-		  </tr>
-		</table>
-	  </td>
-	  <td >
-		<div id="pencil">
-		  <img style="height:40px;width:25px;" src="img/pencil-cursor.png"></img>
-		</div>
-	  </td>
-	  <td>
-		<div id="eraser">
-		  <img style="height:40px;width:25px;" src="img/eraser-cursor.png"></img>
-		</div>
-	  </td>
+			<td>
+				<div class="box" id="currentColor"></div>
+			</td>
+			<td>
+			</td>
+			<td>
+				<table>
+					<tr id="firstColorRow">
+						
+					</tr>
+					<tr id="secondColorRow">
+						
+					</tr>
+				</table>
+			</td>
+			<td >
+				<div id="pencil">
+				<img style="height:40px;width:25px;" src="img/pencil-cursor.png"></img>
+				</div>
+			</td>
+			<td>
+				<div id="eraser">
+				<img style="height:40px;width:25px;" src="img/eraser-cursor.png"></img>
+				</div>
+			</td>
 		</tr>
-		
-	  </table>
-	<table>
+	</table>
+	<table id = "guess-table">
 		<tr>
-			<td id="guess-space" class="guessspace">
+			<td id="guess-space" class="guessspace" hidden>
 				<label name="wordguess" for="wordguess">Your Guess:</label>
 				<input type="text" id="wordguess">
 			</td>
 		</tr>
 	</table>
-	<table id = "difficulty-space" class="difficultyspace">
+	<table id = "difficulty-table" class="difficultyspace" hidden>
 		<tr>
 			<td>
 				<button id="easyWord" style="background-color: green; border-radius: 8px;">Easy</button> 
