@@ -325,7 +325,7 @@ app.get("/newRoomEntry", function (req, res) {
             res.status(400);
         }
 
-        console.log("newRoomEntries: " + JSON.stringify(response.rows));
+        //console.log("newRoomEntries: " + JSON.stringify(response.rows));
     });
 });
 
