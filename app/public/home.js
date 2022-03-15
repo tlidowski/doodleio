@@ -117,6 +117,7 @@ document.getElementById("signOut").addEventListener("click", function () {
 });
 
 document.getElementById("newGameButton").addEventListener("click", () => {
+
     fetch("/newRoomEntry")
         .then(function (response) {
             return response.json();
@@ -133,6 +134,7 @@ document.getElementById("newGameButton").addEventListener("click", () => {
                 alert("All game rooms are full. Please try again later.");
             }
         });
+    // need to set isAvailable to false;
 });
 
 document.getElementById("joinGameButton").addEventListener("click", () => {

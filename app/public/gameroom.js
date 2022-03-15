@@ -121,6 +121,7 @@ function countDown() {
 
         if (roundsLeft <= 0) {
             timerBox.textContent = "Game Over!";
+            userStatUpdate();
         } else {
             cooldownSeconds = 5*(milliPerSec/1000);
             cooldownInterval = setInterval(coolDown, milliPerSec);
@@ -484,4 +485,8 @@ function doodlioTurn(){
         setTimeout(function() {countdownInterval = setInterval(countDown, milliPerSec)}, 4000) //Wait for wordSelect to end timer
 
     
+}
+
+function userStatUpdate () {
+    //will add to this
 }

@@ -314,7 +314,7 @@ app.post("/user", function (req, res) {
 
 app.get("/newRoomEntry", function (req, res) {
     pool.query(
-        "SELECT roomID FROM rooms WHERE isPlaying = FALSE AND isAvailable = TRUE"
+        "SELECT roomID FROM rooms WHERE isPlaying = FALSE AND isAvailable = TRUE AND NOT roomid = 'blank' "
     ).then(function (response) {
         let openRooms = JSON.stringify(response.rows);
         if (openRooms.length > 0) {
