@@ -64,7 +64,8 @@ let ctx = doodleBox.getContext("2d");
 let lastSentf;
 
 // Gameflow globals
-let startButton = document.getElementById("start-button")
+let startButton = document.getElementById("start-button");
+let playerInfo = [];
 let activePlayers = []; //list that holds username:points pairs.
 let correctGuesses = 0;
 let turn = 1;
@@ -359,11 +360,28 @@ function clearWordSpace() {
 
 //syncing clocks
 socket.on("startClock", function (data) {
+    for (userIdx = 0; userIdx < activePlayers.length; userIdx++) {
+        playerInfo.push({"username": activePlayers[userIdx], "active": true, "points": 0});
+    }
+
+    console.log(playerInfo);
+
     doodlioTurn();
 });
 
 startButton.addEventListener("click", function() {
     socket.emit("pressedStart", {roomNum: params.get("roomId")});
+
+    let startRoom = params.get("roomId");
+    fetch(`/gameStart?roomCode=${startRoom}`).then(function (response) {
+		if (response.status === 200) {
+			return;
+		} else {
+			throw Error(response.status);
+		}
+	}).catch(function (error) {
+		console.log(error);
+	});
 })
 
 function gameStartUnHide() {

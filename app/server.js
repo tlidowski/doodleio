@@ -181,9 +181,19 @@ io.on("connection", function (socket) {
                     [user.roomNum]
                 );
 
-                if (numPlayers <= 0) {
+                console.log("NUM PLAYERS: " + numPlayers);
+
+                if (numPlayers <= 1) {
                     pool.query(
                         "UPDATE rooms SET isAvailable = TRUE where roomid = $1",
+                        [user.roomNum]
+                    ).catch(function (error) {
+                        return -1;
+                    });
+
+                    console.log(user.roomNum);
+                    pool.query(
+                        "UPDATE rooms SET isPlaying = FALSE where roomid = $1",
                         [user.roomNum]
                     ).catch(function (error) {
                         return -1;
@@ -314,6 +324,17 @@ app.get("/newRoomEntry", function (req, res) {
         }
 
         console.log("newRoomEntries: " + JSON.stringify(response.rows));
+    });
+});
+
+app.get("/gameStart", function (req, res) {
+    let room = req.query["roomCode"];
+    pool.query(
+        "UPDATE rooms SET isPlaying = TRUE where roomid = $1" , [room]
+    ).then(function (response) {
+        res.status(200);
+    }).catch(function(response) {
+        res.status(500).send();
     });
 });
 
