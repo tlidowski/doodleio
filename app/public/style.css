@@ -34,6 +34,14 @@
 	text-align: center;
 	font-size: 30px;
 }
+.toolbox{
+	width: 502px;
+	height: 50px;
+	border: none;
+	background-color: #2292A4;
+	text-align: center;
+	font-size: 30px;
+}
 .timerspace{
 	border: none;
 	width: 149px;

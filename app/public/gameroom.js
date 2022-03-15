@@ -355,14 +355,17 @@ let headerTable = document.getElementById("game-header-table")
 let toolTable = document.getElementById("tool-select-table")
 let guessTable = document.getElementById("guess-table")
 let difficultyTable = document.getElementById("difficulty-table")
+let confirmWordButton = document.getElementById("confirmWordButton")
 
 function tableHide(isArtist) { 
     if (isArtist){
         difficultyTable.removeAttribute("hidden")
         guessTable.setAttribute("hidden","hidden")
+        confirmWordButton.setAttribute("hidden", "hidden")
     } else { //is Guesser
         difficultyTable.setAttribute("hidden","hidden")
         guessTable.removeAttribute("hidden")
+        confirmWordButton.removeAttribute("hidden")
     }
 }
 
