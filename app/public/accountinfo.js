@@ -26,3 +26,34 @@ let totalpointsText = document.getElementById("totalPoints");
 
 console.log(getCookie("username"));
 userText.textContent = getCookie("username");
+acctUpdate();
+
+function acctUpdate () {
+  fetch("/numgames?username=" + getCookie("username")).then(function (response) {
+    return response.json();
+  }).then(function (data) {
+    console.log("numgames: " + data.numgames);
+    gamesPlayedText.textContent = "Games Played: " + data.numgames;
+  });
+
+  fetch("/numwon?username=" + getCookie("username")).then(function (response) {
+    return response.json();
+  }).then(function (data) {
+    console.log("numwon: " + data.numwon);
+    gamesWonText.textContent = "Games Won: " + data.numwon;
+  });
+
+  fetch("/highscore?username=" + getCookie("username")).then(function (response) {
+      return response.json();
+  }).then(function (data) {
+    console.log("highscore: " + data.highscore);
+    highScoreText.textContent = "Highest Game Score: " + data.highscore;
+  });
+
+  fetch("/totalpoints?username=" + getCookie("username")).then(function (response) {
+    return response.json();
+  }).then(function (data) {
+    console.log("totalpoints: " + data.totalpoints);
+    totalpointsText.textContent = "Overall Total Game Score: " + data.totalpoints;
+  });
+}

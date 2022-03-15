@@ -372,8 +372,40 @@ app.get("/highscore", function (req, res) {
     let userForHS = req.query["username"];
     pool.query("SELECT highscore FROM users WHERE username = $1", [userForHS])
         .then(function (response) {
-            console.log(response.rows[0].highscore);
             return res.json({ highscore : response.rows[0].highscore});
+        })
+        .catch(function (error) {
+            return res.sendStatus(500);
+        });
+});
+
+app.get("/numgames", function (req, res) {
+    let userNG = req.query["username"];
+    pool.query("SELECT numgames FROM users WHERE username = $1", [userNG])
+        .then(function (response) {
+            return res.json({ numgames : response.rows[0].numgames});
+        })
+        .catch(function (error) {
+            return res.sendStatus(500);
+        });
+});
+
+app.get("/numwon", function (req, res) {
+    let userNW = req.query["username"];
+    pool.query("SELECT numwon FROM users WHERE username = $1", [userNW])
+        .then(function (response) {
+            return res.json({ numwon : response.rows[0].numwon});
+        })
+        .catch(function (error) {
+            return res.sendStatus(500);
+        });
+});
+
+app.get("/totalpoints", function (req, res) {
+    let userTP = req.query["username"];
+    pool.query("SELECT totalpoints FROM users WHERE username = $1", [userTP])
+        .then(function (response) {
+            return res.json({ totalpoints : response.rows[0].totalpoints});
         })
         .catch(function (error) {
             return res.sendStatus(500);
