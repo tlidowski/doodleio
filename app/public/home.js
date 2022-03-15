@@ -49,6 +49,7 @@ if (!(getCookie("username") == "")) {
 }
 
 document.getElementById("logIn").addEventListener("click", function () {
+    console.log("LOGIN TRIGGERED");
     fetch("/auth", {
         method: "POST",
         headers: {
@@ -123,9 +124,33 @@ document.getElementById("newGameButton").addEventListener("click", () => {
             return response.json();
         })
         .then(function (data) {
-            console.log(data[0]);
-            window.location.href = `http://localhost:3000/gameroom.html?roomId=${data[0].roomid}`;
+            if (data != "NoRoomsAvailable") {
+                console.log(data[0]);
+                console.log(window.location.href);
+
+                let baseUrl = window.location.href.replace("home.html", "");
+
+                window.location.href = `${baseUrl}gameroom.html?roomId=${data[0].roomid}`;
+            } else {
+                alert("All game rooms are full. Please try again later.");
+            }
         });
+});
+
+document.getElementById("joinGameButton").addEventListener("click", () => {
+    let textbox = document.getElementById("joinGameTextField");
+
+    let baseUrl = window.location.href.replace("home.html", "");
+
+    let roomVals = ["OOZK", "QMAJ", "WMJH", "JFRC", "LVNR"];
+
+    console.log(textbox.value);
+
+    if (roomVals.includes(textbox.value)) {
+        window.location.href = `${baseUrl}gameroom.html?roomId=${textbox.value}`;
+    } else {
+        alert("Invalid room Id");
+    }
 });
 
 function accountStatus(signInStatus) {

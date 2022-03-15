@@ -1,55 +1,83 @@
 <!DOCTYPE html>
 <html>
-	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Permanent+Marker" />
-<head>
-	<meta charset="utf-8">
-	<title>Doodl.io Home Screen</title>
-	<link rel="stylesheet" type="text/css" href="style.css">
-</head>
-<body>
-<img src="img/doodlio-transparent.png" alt="Doodl.io Logo" class="logo">
-<div style="text-align: right;">
-	<a href="./accountinfo.html" id="accountInfoButton" class="button" hidden>Account</a>
-	<button id="signOut" hidden="hidden" class="button">Sign Out</button>
-</div>
+    <link
+        rel="stylesheet"
+        type="text/css"
+        href="//fonts.googleapis.com/css?family=Permanent+Marker"
+    />
+    <head>
+        <meta charset="utf-8" />
+        <title>Doodl.io Home Screen</title>
+        <link rel="stylesheet" type="text/css" href="style.css" />
+    </head>
+    <body>
+        <img
+            src="img/doodlio-transparent.png"
+            alt="Doodl.io Logo"
+            class="logo"
+        />
+        <div style="text-align: right">
+            <a
+                href="./accountinfo.html"
+                id="accountInfoButton"
+                class="button"
+                hidden
+                >Account</a
+            >
+            <button id="signOut" hidden="hidden" class="button">
+                Sign Out
+            </button>
+        </div>
 
-<div id="inputBox" class="logininfo">
-	<div>
-		<img class="infobutton" src="img/info-icon.png" id="user-requirements">
-			<label name="username" for="username">Username:</label>
-			<input type="text" id="username">
-			<label name="password" for="password">Password:</label>
-			<input type="password" id="password">
-	</div>
-</div>
+        <div id="inputBox" class="logininfo">
+            <div>
+                <img
+                    class="infobutton"
+                    src="img/info-icon.png"
+                    id="user-requirements"
+                />
+                <label name="username" for="username">Username:</label>
+                <input type="text" id="username" />
+                <label name="password" for="password">Password:</label>
+                <input type="password" id="password" />
+            </div>
+        </div>
 
-<a class="button" id="logIn">Log In</a>
-<a class="button" id="signUp">Sign Up</a>
+        <a class="button" id="logIn">Log In</a>
+        <a class="button" id="signUp">Sign Up</a>
 
-<div class="about">
-	<h2>How to Play</h2>
-	<p>
-		With Doodl.io ("dew-dlee-oh"), four players will face off
-		in three rounds of sketch-y charades. In each 60-second round, every player
-		will get their chance to draw their provided prompt, and other players will
-		attempt to guess the word or phrase before time runs out! Guessers get more
-		points the faster they input the correct answer, and artists get points for
-		correct guesses in a timely manner.
-	</p>
-</div>
+        <div class="about">
+            <h2>How to Play</h2>
+            <p>
+                With Doodl.io ("dew-dlee-oh"), four players will face off in
+                three rounds of sketch-y charades. In each 60-second round,
+                every player will get their chance to draw their provided
+                prompt, and other players will attempt to guess the word or
+                phrase before time runs out! Guessers get more points the faster
+                they input the correct answer, and artists get points for
+                correct guesses in a timely manner.
+            </p>
+        </div>
 
-<div class="options center">
-	<div>
-		<button id="newGameButton" class="button-disabled">New Game</button>
-	</div>
-	<div>
-		<button id="joinGameButton" class="button-disabled">Join Game</button>
-	</div>
-</div>
+        <div class="options center">
+            <div>
+                <button id="newGameButton" class="button-disabled">
+                    New Game
+                </button>
+            </div>
 
-<script src="home.js">
+            <div>
+                <label for="joinGameTextField">Room:</label>
+                <input id="joinGameTextField" />
+            </div>
 
-</script>
+            <div>
+                <button id="joinGameButton" class="button-disabled">
+                    Join Game
+                </button>
+            </div>
+        </div>
 
-</body>
+        <script src="home.js"></script>
+    </body>
 </html>
