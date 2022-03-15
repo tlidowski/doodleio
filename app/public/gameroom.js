@@ -286,16 +286,15 @@ let wordSpace = document.getElementById("word-space");
 
 newWordButton.addEventListener("click", function () {
 	fetch(`/gameroom?difficulty=${selectedDiff}`).then(function (response) {
-		console.log(response);
 		if (response.status === 200) {
 			return response.json();
 		} else {
 			throw Error(response.status);
 		}
 	}).then(function (response) {
-        if(response.rows.length != 0){
-            wordSpace.textContent = response.rows[0];
-            let chosenWord = response.rows[0]
+        if(response.word != ''){
+            wordSpace.textContent = response.word;
+            let chosenWord = response.word;
             console.log(chosenWord);
 
             let letterList = chosenWord.split("");

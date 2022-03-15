@@ -200,7 +200,6 @@ app.get("/guess", function (req, res) {
 let validDifficulty = ["easy", "medium", "hard", "expert"];
 app.get("/gameroom", async function (req, res) {
     let diff = req.query["difficulty"];
-    console.log("Diff: " + diff);
     if (!validDifficulty.includes(diff)) {
         console.log("Not a valid difficulty level")
         .then(function (response) {
@@ -211,7 +210,7 @@ app.get("/gameroom", async function (req, res) {
         });
     } else {
         let respWord = await selectFrom('word','words', `WHERE difficulty = $1 ORDER BY RANDOM() LIMIT 1`, [diff]);
-        console.log("Response Word: "+ respWord);
+        return res.json({ word : respWord });
     };
 });
 
