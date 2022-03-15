@@ -309,7 +309,8 @@ app.get("/newRoomEntry", function (req, res) {
             res.status(200);
             res.send(openRooms);
         } else {
-            res.send("bleh");
+            res.send("NoRoomsAvailable");
+            res.status(400);
         }
 
         console.log("newRoomEntries: " + JSON.stringify(response.rows));
