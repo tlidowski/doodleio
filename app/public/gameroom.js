@@ -71,6 +71,7 @@ let correctGuesses = 0;
 let turn = 1;
 let roundsLeft = 3;
 let isPlaying = false;
+let chosenWord = '';
 
 
 // Cookies
@@ -299,21 +300,25 @@ function findSelectedDifficulty() {fetch(`/gameroom?difficulty=${selectedDiff}`)
 }).then(function (response) {
     if(response.word != ''){
         wordSpace.textContent = response.word;
-        var chosenWord = response.word;
+        chosenWord = response.word;
         console.log(chosenWord);
+
+        socket.emit("wordPicked", {roomNum: params.get("roomId"), chosenWord: chosenWord});
 
         let letterList = chosenWord.split("");
         console.log(letterList);
         let pickedIndices = []
         updateWordBox(letterList, pickedIndices);
 
-        setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.5)
-        setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.75)
-        setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.9)
     }
 }).catch(function (error) {
     console.log(error);
 });}
+
+socket.on("wordSent", function (data) {
+    chosenWord = data.chosenWord; 
+    console.log(chosenWord);
+});
 
 function updateWordBox(letterList, pickedIndices) {
     clearWordSpace();
@@ -333,6 +338,14 @@ function updateWordBox(letterList, pickedIndices) {
         }
         wordBox.append(box);
     }
+
+    
+}
+
+function updateWordBoxGuesser (letterList, pickedIndices){
+    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.5)
+    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.75)
+    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.9)
 }
 
 function revealLetter(letterList, pickedIndices){

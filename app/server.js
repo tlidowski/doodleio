@@ -136,6 +136,10 @@ io.on("connection", function (socket) {
         io.in(data.roomNum).emit("startClock", {});
     });
 
+    socket.on("wordPicked", function (data) {
+        socket.to(data.roomNum).emit("wordSent", {chosenWord: data.chosenWord});
+    });
+
     socket.on("drawClick", function (data) {
         // from https://github.com/bradtraversy/chatcord
 
