@@ -239,16 +239,22 @@ app.get("/gameroom", async function (req, res) {
         console
             .log("Not a valid difficulty level");
             
-        return res.send().status(500);
+        res.send().status(500);
     } else {
         let respWord = await selectFrom(
             "word",
             "words",
             `WHERE difficulty = $1 ORDER BY RANDOM() LIMIT 1`,
             [diff]
-        );
-        return res.json({ word: respWord });
+        ).then(function(respWord){
+            res.json({ word: respWord });
+	}).catch(function(error{
+	    res.send().status(500);
+	}
+			);
+		
     }
+    
 });
 
 //User Authentication
