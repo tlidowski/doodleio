@@ -197,6 +197,24 @@ app.get("/guess", function (req, res) {
     }
 });
 
+let validDifficulty = ["easy", "medium", "hard", "expert"];
+app.get("/gameroom", async function (req, res) {
+    let diff = req.query["difficulty"];
+    console.log("Diff: " + diff);
+    if (!validDifficulty.includes(diff)) {
+        console.log("Not a valid difficulty level")
+        .then(function (response) {
+            return res.json();
+        })
+        .catch(function (error) {
+            return res.sendStatus(500);
+        });
+    } else {
+        let respWord = await selectFrom('word','words', `WHERE difficulty = $1 ORDER BY RANDOM() LIMIT 1`, [diff]);
+        console.log("Response Word: "+ respWord);
+    };
+});
+
 //User Authentication
 app.post("/user", function (req, res) { //signup
     let username = req.body.username; 
