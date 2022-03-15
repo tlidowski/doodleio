@@ -22,16 +22,15 @@ const { createRoom, startRoom, joinRoom, leaveRoom } = require("./roommanager");
 
 async function selectFrom(data, table, condition, parameters) {
     try {
-      const res = await pool.query(
-        `SELECT ${data} FROM ${table} ${condition}`, parameters
-      );
-      return res.rows[0][data];
+        const res = await pool.query(
+            `SELECT ${data} FROM ${table} ${condition}`,
+            parameters
+        );
+        return res.rows[0][data];
     } catch (err) {
-      return err.stack;
+        return err.stack;
     }
-  }
-
-
+}
 
 //Taken From Login/Create Exercise
 const saltRounds = 10;
@@ -61,53 +60,68 @@ userRoomsLocalStorage = [];
 io.on("connection", function (socket) {
     console.log("a user connected");
 
-
     socket.on("joinRoom", async function ({ username, roomNum }) {
         // loosely based on: https://github.com/bradtraversy/chatcord
-        
+
         id = socket.id;
         const user = { id, username, roomNum };
 
-        let isPlaying = await selectFrom('isplaying','rooms', `WHERE roomid = $1`, [user.roomNum]); //needs the start button
+        let isPlaying = await selectFrom(
+            "isplaying",
+            "rooms",
+            `WHERE roomid = $1`,
+            [user.roomNum]
+        ); //needs the start button
 
         if (!isPlaying) {
-            
             //update users
-            pool.query('UPDATE users SET roomID = $1 where username = $2', [user.roomNum, user.username])
-                .catch(function(error){
-                    return -1;
-                 });
+            pool.query("UPDATE users SET roomID = $1 where username = $2", [
+                user.roomNum,
+                user.username,
+            ]).catch(function (error) {
+                return -1;
+            });
 
-            userRoomsLocalStorage.push({ roomNum: roomNum, id: socket.id, username:username });
+            userRoomsLocalStorage.push({
+                roomNum: roomNum,
+                id: socket.id,
+                username: username,
+            });
 
             socket.join(user.roomNum);
 
-            
-
             // check amount of people in room
-            let numPlayers = await selectFrom('numplayers','rooms', `WHERE roomid = $1`, [user.roomNum]); 
+            let numPlayers = await selectFrom(
+                "numplayers",
+                "rooms",
+                `WHERE roomid = $1`,
+                [user.roomNum]
+            );
 
             if (numPlayers >= 4) {
                 console.log("Room is full!");
-                pool.query('UPDATE rooms SET isplaying = TRUE where roomid = $1', [user.roomNum])
-                .catch(function(error){
-                     return -1;
-                 }); //redirect --> home.html
+                pool.query(
+                    "UPDATE rooms SET isplaying = TRUE where roomid = $1",
+                    [user.roomNum]
+                ).catch(function (error) {
+                    return -1;
+                }); //redirect --> home.html
             }
-        
+
             console.log(user.username + "joined " + user.roomNum);
 
             // send out active players
             let listPlayers = [];
             for (let userInfo in userRoomsLocalStorage) {
-                if (userRoomsLocalStorage[userInfo].roomNum === user.roomNum){
+                if (userRoomsLocalStorage[userInfo].roomNum === user.roomNum) {
                     listPlayers.push(userRoomsLocalStorage[userInfo].username);
                 }
             }
             //console.log(listPlayers);
-            io.in(roomNum).emit("activePlayers", {activePlayers:listPlayers});
+            io.in(roomNum).emit("activePlayers", {
+                activePlayers: listPlayers,
+            });
         }
-        
     });
 
     socket.on("pressedStart", function (data) {
@@ -127,49 +141,61 @@ io.on("connection", function (socket) {
         });
     });
 
-    socket.on("disconnect", async function ()  {
+    socket.on("disconnect", async function () {
         console.log("user disconnected");
 
         for (let i = 0; i < userRoomsLocalStorage.length; i++) {
             let user = userRoomsLocalStorage[i];
             if (user.id === socket.id) {
-
                 //update users
-                pool.query('UPDATE users SET roomid = $1 where username = $2', ['blank', user.username])
-                     .catch(function(error){
-                         return -1;
-                      });
+                pool.query("UPDATE users SET roomid = $1 where username = $2", [
+                    "blank",
+                    user.username,
+                ]).catch(function (error) {
+                    return -1;
+                });
 
                 //update rooms
-                pool.query('UPDATE rooms SET numplayers = numplayers - 1 where roomid = $1', [user.roomNum])
-                .then(function(response){
+                pool.query(
+                    "UPDATE rooms SET numplayers = numplayers - 1 where roomid = $1",
+                    [user.roomNum]
+                ).then(function (response) {
                     //console.log(response); // switch to async.
-                 });
+                });
 
-                 let numPlayers = await selectFrom('numplayers','rooms', `WHERE roomid = $1`, [user.roomNum]); 
+                let numPlayers = await selectFrom(
+                    "numplayers",
+                    "rooms",
+                    `WHERE roomid = $1`,
+                    [user.roomNum]
+                );
 
                 if (numPlayers <= 0) {
-                    pool.query('UPDATE rooms SET isAvailable = TRUE where roomid = $1', [user.roomNum])
-                        .catch(function(error){
-                            return -1;
-                    }); 
-            }
+                    pool.query(
+                        "UPDATE rooms SET isAvailable = TRUE where roomid = $1",
+                        [user.roomNum]
+                    ).catch(function (error) {
+                        return -1;
+                    });
+                }
 
                 userRoomsLocalStorage.splice(i, 1);
 
-                 // send out active players
+                // send out active players
                 let listPlayers = [];
                 for (let userInfo in userRoomsLocalStorage) {
-                    if (userRoomsLocalStorage[userInfo].roomNum === user.roomNum){
-                        listPlayers.push(userRoomsLocalStorage[userInfo].username);
+                    if (
+                        userRoomsLocalStorage[userInfo].roomNum === user.roomNum
+                    ) {
+                        listPlayers.push(
+                            userRoomsLocalStorage[userInfo].username
+                        );
                     }
                 }
                 console.log(listPlayers);
                 console.log("deleted user ");
             }
         }
-
-       
     });
 });
 
@@ -187,8 +213,9 @@ app.get("/guess", function (req, res) {
 });
 
 //User Authentication
-app.post("/user", function (req, res) { //signup
-    let username = req.body.username; 
+app.post("/user", function (req, res) {
+    //signup
+    let username = req.body.username;
     let plaintextPassword = req.body.plaintextPassword;
     // TODO check body has username and plaintextPassword keys
     // TODO check password length >= 5 and <= 36
@@ -240,7 +267,24 @@ app.post("/user", function (req, res) { //signup
         });
 });
 
-app.post("/auth", function (req, res) { //login
+app.get("/newRoomEntry", function (req, res) {
+    pool.query(
+        "SELECT roomID FROM rooms WHERE isPlaying = FALSE AND isAvailable = TRUE"
+    ).then(function (response) {
+        let openRooms = JSON.stringify(response.rows);
+        if (openRooms.length > 0) {
+            res.status(200);
+            res.send(openRooms);
+        } else {
+            res.send("bleh");
+        }
+
+        console.log("newRoomEntries: " + JSON.stringify(response.rows));
+    });
+});
+
+app.post("/auth", function (req, res) {
+    //login
     console.log("Attempting...");
     let username = req.body.username;
     let plaintextPassword = req.body.plaintextPassword;
