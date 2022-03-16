@@ -448,7 +448,7 @@ socket.on("startClock", function (data) {
         playerInfo.push({"username": activePlayers[userIdx], "active": true, "points": 0});
     }
 
-    console.log(playerInfo);
+    console.log(`Player Info is: ${playerInfo}`);
 
     doodlioTurn();
 });
@@ -497,7 +497,7 @@ socket.on("activePlayers", function (data) {
             }
         } 
 
-        console.log(playerInfo);
+        console.log(`${playerInfo}`);
     }
     
 });
