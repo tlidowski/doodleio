@@ -16,12 +16,12 @@ CREATE TABLE rooms(
     isPlaying BOOLEAN, 
     numPlayers INT);
 
-INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('blank', true, false, 0, 0, 0);
-INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('WMJH', true, false, 0, 0, 1);
-INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('JFRC', true, false, 0, 0, 1);
-INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('LVNR', true, false, 0, 0, 1);
-INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('OOZK', true, false, 0, 0, 1);
-INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers, roundNum, currentTurn) VALUES ('QMAJ', true, false, 0, 0, 1);
+INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers) VALUES ('blank', true, false, 0);
+INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers) VALUES ('WMJH', true, false, 0);
+INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers) VALUES ('JFRC', true, false, 0);
+INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers) VALUES ('LVNR', true, false, 0);
+INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers) VALUES ('OOZK', true, false, 0);
+INSERT INTO rooms (roomID, isAvailable, isPlaying, numPlayers) VALUES ('QMAJ', true, false, 0);
 
 -- table for list of users
 CREATE TABLE users(
