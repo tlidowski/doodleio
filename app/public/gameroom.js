@@ -688,6 +688,13 @@ function userStatUpdate () {
         }
     }
 
+    //update winner to header
+    roundSpace.textContent = `Winner:`
+    turnSpace.textContent = `${winner}`
+    artistSpace.textContent = `Their Score:`
+    timerBox.textContent = `${maxScore}`
+    wordSpace.textContent = `Free Draw!`
+
     console.log(thisUser);
     console.log("WINNER: " + winner + " with points: " + maxScore);
 
