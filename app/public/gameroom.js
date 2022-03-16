@@ -41,7 +41,7 @@ let artistSpace = document.getElementById("artist-space")
 roomCodeSpace.textContent = `${params.get("roomId")}`
 
 //Current Default; Change When Artist Characteristic is Accessible
-let isArtist = false;
+let isArtist = true;
 
 let newWordButton = document.getElementById("newWordButton");
 //Guess Box
@@ -71,9 +71,8 @@ let turn = 1;
 let roundsLeft = 3;
 let isPlaying = false;
 let chosenWord = '';
+let currentDiff;
 let wordRevealInterval = null;
-let curentDiff;
-
 
 // Cookies
 function getCookie(cname) {
@@ -322,6 +321,7 @@ function findSelectedDifficulty() {fetch(`/gameroom?difficulty=${selectedDiff}`)
 socket.on("wordSent", function (data) {
     chosenWord = data.chosenWord; 
     currentDiff = data.diff;
+    console.log(currentDiff)
     console.log(`Chosen Word is: ${chosenWord}`);
 });
 
@@ -375,13 +375,12 @@ let wordCountdown = document.getElementById("wordDiffCountdown")
 
 
 function tableHide(isArtist) { //before turn start reset visibility
+    guessTable.setAttribute("hidden","hidden")
     if (isArtist){
         difficultyTable.removeAttribute("hidden")
-        guessTable.setAttribute("hidden","hidden")
         toolTable.removeAttribute("hidden")
     } else { //is Guesser
         difficultyTable.setAttribute("hidden","hidden")
-        guessTable.removeAttribute("hidden")
         toolTable.setAttribute("hidden","hidden")
     }
 }
@@ -403,6 +402,12 @@ function wordSelectCountdown() {//updates timer in word box, hides diffTable, an
         5*milliPerSec);
     } else {
         wordSpace.textContent = ''
+        setTimeout(function() {
+            guessTable.removeAttribute("hidden");
+          // clearInterval(wordInterval);
+          // TODO add ability to draw
+        },
+        5*milliPerSec)
     }
 }
 
@@ -411,6 +416,7 @@ function updateWordTime(seconds, isArtist) { //updates timer in word box
         wordCountdown.textContent = `Confirm Word Difficulty in: ${seconds}`;
     } else {
         wordSpace.textContent = `Start Guessing in: ${seconds}`;
+        guessTable.setAttribute("hidden", "hidden")
     }
 }
 let oldGuessBox = document.getElementById('past-guesses')
@@ -488,6 +494,8 @@ socket.on("startClock", function (data) {
 });
 
 startButton.addEventListener("click", function() {
+    isArtist = false
+    tableHide("isArtist")
     socket.emit("pressedStart", {roomNum: params.get("roomId")});
 
     let startRoom = params.get("roomId");
@@ -568,24 +576,30 @@ socket.on("correctGuessUpdates", function (data) {
     correctGuesses += 1;
     console.log("There was a correct guess")
     console.log("data: " + data.points);
-    console.log(selectedDiff)
+    console.log(chosenWord)
 
     for (let s = 0; s < playerInfo.length; s++){
-        if (data.username === playerInfo[s].username) {
+        if (data.username === playerInfo[s].username) { //update correct guesser's score
             playerInfo[s].points += data.points;   
             console.log(`Giving Guesser ${playerInfo[s].username} ${data.points} points`)
-        } else if (activePlayers[turn-1] === playerInfo[s].username) { //Artist scored by 5*wordDiff (easy=1; expert=4)
+        } else if (activePlayers[turn-1] === playerInfo[s].username) { //current artist score matches user in database
             let wordMult = null
-            if (selectedDiff == "easy"){
+            let diff = ""
+            if (isArtist){
+                diff = selectedDiff
+            } else {
+                diff = currentDiff
+            }
+            if (diff == "easy"){
                 wordMult = 1
-            } else if (selectedDiff =="medium"){
+            } else if (diff =="medium"){
                 wordMult = 2
-            } else if (selectedDiff == "hard"){
+            } else if (diff == "hard"){
                 wordMult = 3
-            } else if (selectedDiff == "expert"){
+            } else if (diff == "expert"){
                 wordMult = 4
             }
-            console.log(`Giving Artist ${playerInfo[s].username} ${5*wordMult} points`)
+            console.log(`Giving Artist ${playerInfo[s].username} ${5*wordMult} points`)  //Artist scored by 5*wordDiff (easy=1; expert=4)
             playerInfo[s].points += 5*wordMult;        
         }
         console.log(`New Total: ${playerInfo[s].points}`)
@@ -620,8 +634,8 @@ function doodlioTurn(){
     turnGuesses = [];
     clearWordSpace();
     headerTable.removeAttribute("hidden")
-    turnSpace.textContent = `Turn: ${turn}`
-    roundSpace.textContent = `Round: ${(3-roundsLeft) + 1}`
+    turnSpace.textContent = `Turn: ${turn} / ${activePlayers.length}`
+    roundSpace.textContent = `Round: ${(3-roundsLeft) + 1} / 3`
     artistSpace.textContent = `Artist: ${activePlayers[turn-1]}`
     console.log("CURRENT TURN: " + turn + " and Round: " + ((3-roundsLeft) + 1));
     correctGuesses = 0;
@@ -632,6 +646,7 @@ function doodlioTurn(){
     } else { //user is guesser
         isArtist = false;
     }
+    tableHide(isArtist)
     wordSelectCountdown()
     if (!isArtist){//find chosen word
 
@@ -640,9 +655,9 @@ function doodlioTurn(){
             console.log(`New Word: ${letterList}`)
             updateWordBox(letterList, [])
             updateWordBoxGuesser(letterList, [])
-        }, 7*milliPerSec)
+            guessTable.removeAttribute("hidden")
+        }, 6*milliPerSec)
     }
-    tableHide(isArtist)
     ctx.clearRect(0, 0, doodleBox.width, doodleBox.height);
 
     turnSeconds = 60*(milliPerSec/1000);
@@ -651,6 +666,8 @@ function doodlioTurn(){
 }
 
 function userStatUpdate () {
+    isArtist = true
+    toolTable.removeAttribute("hidden")
     // find winner;
     let winner = ''; 
     let maxScore = 0;
