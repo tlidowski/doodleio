@@ -709,6 +709,7 @@ function userStatUpdate () {
 
     // update stats
     let data = {username: thisUser.username, points: thisUser.points};
+    
 
     fetch("/updateRegStats", {
         method: 'POST',
@@ -726,11 +727,41 @@ function userStatUpdate () {
 		console.log("Bad request");
 	});
 
-    // if (thisUser.points > userHighscore) {
-        
-    // } else {
+    if (thisUser.points > userHighscore) {
+        fetch("/updateHighScore", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        }).then(function (response) {
+            if (!(response.status === 200)) {
+                throw Error();
+            }
+        }).then(function (data) {
+            console.log("Success");
+        }).catch(function (error) {
+            console.log("Bad request");
+        });
+    }
 
-    // }
+    if (thisUser.username === winner) {
+        fetch("/updateNumWon", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        }).then(function (response) {
+            if (!(response.status === 200)) {
+                throw Error();
+            }
+        }).then(function (data) {
+            console.log("Success");
+        }).catch(function (error) {
+            console.log("Bad request");
+        });
+    }
     
 
 

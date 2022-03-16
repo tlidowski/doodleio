@@ -407,6 +407,34 @@ app.post("/updateRegStats", function (req, res) {
         });
 });
 
+app.post("/updateHighScore", function (req, res) {
+	let body = req.body;
+    let user = body.username;
+    let points = body.points;
+    pool.query(
+            "UPDATE users SET highscore = $1 WHERE username = $2",
+            [points, user]
+        ).then(function (response) {
+                return res.send();
+        }).catch(function (error) {
+                return res.sendStatus(500);
+        });
+});
+
+app.post("/updateNumWon", function (req, res) {
+	let body = req.body;
+    let user = body.username;
+    let points = body.points;
+    pool.query(
+            "UPDATE users SET numwon = numwon + 1 WHERE username = $1",
+            [user]
+        ).then(function (response) {
+                return res.send();
+        }).catch(function (error) {
+                return res.sendStatus(500);
+        });
+});
+
 app.get("/numgames", function (req, res) {
     let userNG = req.query["username"];
     pool.query("SELECT numgames FROM users WHERE username = $1", [userNG])
