@@ -260,6 +260,7 @@ doodleBox.addEventListener("mousemove", emitDraw);
 
 
 //Generate Word Space
+let difficultList = ["easy", "medium", "hard", "expert"]
 let selectedDiff = "easy";
 let easyWordButton = document.getElementById("easyWord");
 let medWordButton = document.getElementById("medWord");
@@ -290,7 +291,7 @@ exWordButton.addEventListener("click", function () {
 });
 
 randWordButton.addEventListener("click", function () {
-    selectedDiff = "random";
+    selectedDiff = difficultList[Math.floor(Math.random()*difficultList.length)];
     selectedDiffBox.textContent = `Selected Difficulty: ${selectedDiff.toUpperCase()}`
 });
 
@@ -467,7 +468,7 @@ socket.on("startClock", function (data) {
 
     console.log(playerInfo);
 
-    for (i = 0; i<playerInfo.length; i++){
+    for (i = 0; i < playerInfo.length; i++){
         let user = playerInfo[i].username
         let score = playerInfo[i].points
         if (i == 0){
@@ -563,15 +564,33 @@ socket.on("activePlayers", function (data) {
 // on correct guesses
 socket.on("correctGuessUpdates", function (data) {
     correctGuesses += 1;
-
+    console.log("There was a correct guess")
     console.log("data: " + data.points);
+    console.log(selectedDiff)
 
     for (let s = 0; s < playerInfo.length; s++){
         if (data.username === playerInfo[s].username) {
             playerInfo[s].points += data.points;   
+            console.log(`Giving Guesser ${playerInfo[s].username} ${data.points} points`)
+        } else if (activePlayers[turn-1] === playerInfo[s].username) { //Artist scored by 5*wordDiff (easy=1; expert=4)
+            let wordMult = null
+            if (selectedDiff == "easy"){
+                wordMult = 1
+            } else if (selectedDiff =="medium"){
+                wordMult = 2
+            } else if (selectedDiff == "hard"){
+                wordMult = 3
+            } else if (selectedDiff == "expert"){
+                wordMult = 4
+            }
+            console.log(`Giving Artist ${playerInfo[s].username} ${5*wordMult} points`)
+            playerInfo[s].points += 5*wordMult;        
         }
+        console.log(`New Total: ${playerInfo[s].points}`)
     }
-    for (i = 0; i<playerInfo.length; i++){
+
+    console.log(playerInfo)
+    for (i = 0; i < playerInfo.length; i++){
         let user = playerInfo[i].username
         let score = playerInfo[i].points
         if (i == 0){
