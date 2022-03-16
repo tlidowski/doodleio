@@ -53,9 +53,9 @@
                 three rounds of sketch-y charades. In each 60-second round,
                 every player will get their chance to draw their provided
                 prompt, and other players will attempt to guess the word or
-                phrase before time runs out! Guessers get more points the faster
-                they input the correct answer, and artists get points for
-                correct guesses in a timely manner.
+                phrase before time runs out! Guessers get more points the less 
+                guesses they take, and artists get points for correct guesses 
+                based on their word difficulty.
             </p>
         </div>
 
@@ -74,6 +74,16 @@
                     New Game
                 </button>
             </div>
+        </div>
+        <div class="about">
+            <h2>Scoring</h2>
+            <p>
+                Guessers get 20 points if they get the word on the first try, 
+                and lose 5 points for each wrong guess, with only 5 points
+                earned if they take more than three guesses. Artists have a
+                difficulty multiplier, where easy=1 and expert=4. They earn 5
+                times the multiplier for each correct guess made on their art.
+            </p>
         </div>
 
         <script src="home.js"></script>
