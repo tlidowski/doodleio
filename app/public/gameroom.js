@@ -542,21 +542,62 @@ function doodlioTurn(){
 
 function userStatUpdate () {
     // find winner;
+    let winner = ''; 
+    let maxScore = 0;
+    let thisUser = '';
+    let userHighscore = 0;
 
     for (let s = 0; s < playerInfo.length; s++){
         if (playerInfo[s].active) {
+            if (getCookie("username") === playerInfo[s].username) {
+                thisUser = playerInfo[s];
+            }
 
+            if (playerInfo[s].points > maxScore){
+                maxScore = playerInfo[s].points;
+                winner = playerInfo[s].username;
+            }
           
         }
     }
 
+    console.log(thisUser);
+    console.log("WINNER: " + winner + " with points: " + maxScore);
+
+    // get current highscore
     let urlHS = "/highscore?username=" + getCookie("username");
             
     fetch(urlHS).then(function (response) {
         return response.json();
     }).then(function (data) {
-       console.log("highscore? : " + data.highscore);
+       userHighscore = data.highscore;
     });
 
-    //let data = {username: getCookie("username"), points: playerInfo.points};
+    // update stats
+    let data = {username: thisUser.username, points: thisUser.points};
+
+    fetch("/updateRegStats", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    }).then(function (response) {
+		if (!(response.status === 200)) {
+			throw Error();
+		}
+	}).then(function (data) {
+		console.log("Success");
+	}).catch(function (error) {
+		console.log("Bad request");
+	});
+
+    // if (thisUser.points > userHighscore) {
+        
+    // } else {
+
+    // }
+    
+
+
 }
