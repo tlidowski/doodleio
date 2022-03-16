@@ -136,6 +136,10 @@ io.on("connection", function (socket) {
         io.in(data.roomNum).emit("startClock", {});
     });
 
+    socket.on("correctGuessing", function (data) {
+        io.in(data.roomNum).emit("correctGuessUpdates", {username: data.username, points: data.points});
+    });
+
     socket.on("wordPicked", function (data) {
         socket
             .to(data.roomNum)
