@@ -30,7 +30,7 @@ let correctGuess = false
 let clear = document.getElementById("clearCanvas");
 let urlString = window.location.search;
 let params = new URLSearchParams(urlString);
-
+let timeouts = []
 console.log(params.get("roomId"));
 
 //update header bar
@@ -339,9 +339,9 @@ function updateWordBox(letterList, pickedIndices) {//Updates wordbox for artist 
 }
 
 function updateWordBoxGuesser (letterList, pickedIndices){//calls revealLetter 3 times for guesser (CANNOT CALL IN UWB func)
-    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.5)
-    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.75)
-    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.9)
+    timeouts.push(setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.5))
+    timeouts.push(setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.75))
+    timeouts.push(setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.9))
 }
 
 function revealLetter(letterList, pickedIndices){ //reveals letters
@@ -589,6 +589,9 @@ socket.on("correctGuessUpdates", function (data) {
 
 
 function doodlioTurn(){
+    while(timeouts.length>0){
+	clearTimeout(timeouts.pop());
+    }
     correctGuess = false;
     correctGuesses = 0;
     oldGuessBox.textContent = '';
