@@ -389,6 +389,26 @@ app.get("/highscore", function (req, res) {
         });
 });
 
+app.post("/updateRegStats", function (req, res) {
+
+	let body = req.body;
+
+    let user = body.user;
+    let points = body.points;
+
+    console.log("here");
+
+    pool.query(
+            "UPDATE users SET numgames = numgames + 1 where username = $2",
+            [body.points, body.user]
+        ).then(function (response) {
+                return res.send();
+        }).catch(function (error) {
+                return res.sendStatus(500);
+        });
+
+});
+
 app.get("/numgames", function (req, res) {
     let userNG = req.query["username"];
     pool.query("SELECT numgames FROM users WHERE username = $1", [userNG])
