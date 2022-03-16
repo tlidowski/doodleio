@@ -444,6 +444,11 @@ function checkGuess(guess, oldGuesses){
 // ******************************* Gameflow! ******************************************
 
 //syncing clocks
+let player1Box = document.getElementById('player1')
+let player2Box = document.getElementById('player2')
+let player3Box = document.getElementById('player3')
+let player4Box = document.getElementById('player4')
+
 socket.on("startClock", function (data) {
     startButton.setAttribute("hidden", true);
     isPlaying = true;
@@ -452,7 +457,21 @@ socket.on("startClock", function (data) {
         playerInfo.push({"username": activePlayers[userIdx], "active": true, "points": 0});
     }
 
-    console.log(`Player Info is: ${playerInfo}`);
+    console.log(playerInfo);
+
+    for (i = 0; i<playerInfo.length; i++){
+        let user = playerInfo[i].username
+        let score = playerInfo[i].points
+        if (i == 0){
+            player1Box.textContent = `${user}: ${score}`.toUpperCase()
+        } else if (i == 1){
+            player2Box.textContent = `${user}: ${score}`.toUpperCase()
+        } else if (i == 2){
+            player3Box.textContent = `${user}: ${score}`.toUpperCase()
+        } else {
+            player4Box.textContent = `${user}: ${score}`.toUpperCase()
+        }
+    }
 
     doodlioTurn();
 });
@@ -477,6 +496,7 @@ startButton.addEventListener("click", function() {
 //get list of players
 
 socket.on("activePlayers", function (data) {
+    console.log(playerInfo)
     activePlayers = data.activePlayers;
     console.log(activePlayers);
 
@@ -502,6 +522,33 @@ socket.on("activePlayers", function (data) {
         } 
 
         console.log(`${playerInfo}`);
+    }
+
+    for (i = 0; i < 4; i++){
+        console.log("ADDING")
+        if (i < activePlayers.length) {
+            let user = activePlayers[i]
+            if (i == 0){
+                player1Box.textContent = `${user} is in`
+            } else if (i == 1){
+                player2Box.textContent = `${user} is in`
+            } else if (i == 2){
+                player3Box.textContent = `${user} is in`
+            } else {
+                player4Box.textContent = `${user} is in`
+            }
+        } else {
+            if (i == 0){
+                player1Box.textContent = ``
+            } else if (i == 1){
+                player2Box.textContent = ``
+            } else if (i == 2){
+                player3Box.textContent = ``
+            } else {
+                player4Box.textContent = ``
+            }
+        }
+        
     }
     
 });

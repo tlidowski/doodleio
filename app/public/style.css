@@ -25,6 +25,12 @@
 	height: 400px;
 	background-color: rgb(41, 34, 34);
 }
+.playerBox{
+	border: none;
+	width: 149px;
+	height: 100px;
+	text-align: center;
+}
 
 .wordspace{
 	width: 350px;
