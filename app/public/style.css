@@ -13,12 +13,14 @@
 	margin-left: auto;
 	margin-right: auto;
 }
-.drawingboard {
+.drawingboard{
 	border: none;
 	width: 350px;
 	height: 400px;
+	cursor: url("img/pencil-cursor.png"), auto;
 	background-color: #FFFFFF;
 }
+
 .leaderboard{
 	border: none;
 	width: 149px;
@@ -132,6 +134,7 @@
 	width: 3%;
 	height: 3%;
 	padding: 10px;
+	cursor: help;
 	
 }
 
@@ -160,7 +163,6 @@
 
 body {
 	margin: 2rem;
-	cursor: url("img/pencil-cursor.png"), auto;
 	background-image: url("img/bg-tessellation.png");
 	background-repeat: repeat;
 	background-size: 200px 200px;

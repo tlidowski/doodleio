@@ -138,6 +138,9 @@ function countDown() {
 
 //Canvas set up
 
+let currentColor = document.getElementById("currentColor");
+
+
 function setup() {
     let currentColor = document.getElementById("currentColor");
     let styleRow = document.getElementById("styleRow");
@@ -248,7 +251,7 @@ doodleBox.addEventListener("mouseup", function (e) {
     socket.emit("drawnf", { drawnf: false });
 });
 
-pencil.addEventListener("mousedown", function (e) {
+currentColor.addEventListener("mousedown", function (e) {
     flag = true;
 });
 
