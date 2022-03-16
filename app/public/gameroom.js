@@ -126,6 +126,7 @@ function countDown() {
         if (roundsLeft <= 0) {
             timerBox.textContent = "Game Over!";
             userStatUpdate();
+            document.getElementById("homeButton").removeAttribute("hidden")
         } else {
             cooldownSeconds = 5*(milliPerSec/1000);
             cooldownInterval = setInterval(coolDown, milliPerSec);
