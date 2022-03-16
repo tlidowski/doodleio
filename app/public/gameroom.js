@@ -371,9 +371,11 @@ function tableHide(isArtist) { //before turn start reset visibility
     if (isArtist){
         difficultyTable.removeAttribute("hidden")
         guessTable.setAttribute("hidden","hidden")
+        toolTable.removeAttribute("hidden")
     } else { //is Guesser
         difficultyTable.setAttribute("hidden","hidden")
         guessTable.removeAttribute("hidden")
+        toolTable.setAttribute("hidden","hidden")
     }
 }
 
@@ -525,7 +527,6 @@ socket.on("activePlayers", function (data) {
     }
 
     for (i = 0; i < 4; i++){
-        console.log("ADDING")
         if (i < activePlayers.length) {
             let user = activePlayers[i]
             if (i == 0){

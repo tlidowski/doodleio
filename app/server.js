@@ -225,7 +225,9 @@ io.on("connection", function (socket) {
     });
 });
 
-app.get("/guess", function (req, res) {
+window.location.href("home.html")
+
+app.get("/guess", function (req, res) { //doesn't do anything i think but lets keep it in case it does lol
     //Queries guess, user, canGuess
     let body = req.query;
     let guess = body.guess;
