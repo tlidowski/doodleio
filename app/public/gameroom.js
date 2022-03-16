@@ -41,7 +41,7 @@ let artistSpace = document.getElementById("artist-space")
 roomCodeSpace.textContent = `${params.get("roomId")}`
 
 //Current Default; Change When Artist Characteristic is Accessible
-let isArtist = true;
+let isArtist = false;
 
 let newWordButton = document.getElementById("newWordButton");
 //Guess Box
@@ -108,6 +108,7 @@ function coolDown() {
 
 function countDown() {
     timerBox.textContent = `Time Remaining: ${turnSeconds}`;
+    console.log(correctGuesses + " and " + (activePlayers.length - 1));
     if (turnSeconds > 0 && correctGuesses < (activePlayers.length - 1)) {
         turnSeconds--;
     } else {
@@ -437,7 +438,7 @@ function checkGuess(guess, oldGuesses){
         guessTable.setAttribute("hidden","hidden") //hide guessBox
         let score = 0
         correctGuess = true
-        correctGuesses++
+        //correctGuesses++
         if (oldGuesses.length < 2) {
             score = 20 - 5*oldGuesses.length
         } else {
@@ -543,31 +544,34 @@ socket.on("activePlayers", function (data) {
         console.log(`${playerInfo}`);
     }
 
-    for (i = 0; i < 4; i++){
-        if (i < activePlayers.length) {
-            let user = activePlayers[i]
-            if (i == 0){
-                player1Box.textContent = `${user} is in`
-            } else if (i == 1){
-                player2Box.textContent = `${user} is in`
-            } else if (i == 2){
-                player3Box.textContent = `${user} is in`
+    if (!isPlaying){
+        for (i = 0; i < 4; i++){
+            if (i < activePlayers.length) {
+                let user = activePlayers[i]
+                if (i == 0){
+                    player1Box.textContent = `${user} is in`
+                } else if (i == 1){
+                    player2Box.textContent = `${user} is in`
+                } else if (i == 2){
+                    player3Box.textContent = `${user} is in`
+                } else {
+                    player4Box.textContent = `${user} is in`
+                }
             } else {
-                player4Box.textContent = `${user} is in`
+                if (i == 0){
+                    player1Box.textContent = ``
+                } else if (i == 1){
+                    player2Box.textContent = ``
+                } else if (i == 2){
+                    player3Box.textContent = ``
+                } else {
+                    player4Box.textContent = ``
+                }
             }
-        } else {
-            if (i == 0){
-                player1Box.textContent = ``
-            } else if (i == 1){
-                player2Box.textContent = ``
-            } else if (i == 2){
-                player3Box.textContent = ``
-            } else {
-                player4Box.textContent = ``
-            }
+            
         }
-        
     }
+    
     
 });
 
