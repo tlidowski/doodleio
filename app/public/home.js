@@ -104,7 +104,9 @@ document.getElementById("signUp").addEventListener("click", function () {
     });
 });
 
-document.getElementById("user-requirements").addEventListener("click", function () {
+document
+    .getElementById("user-requirements")
+    .addEventListener("click", function () {
         alert(
             "Username must be 1-20 characters \nPassword must be 5-36 characters"
         );
@@ -115,7 +117,6 @@ document.getElementById("signOut").addEventListener("click", function () {
 });
 
 document.getElementById("newGameButton").addEventListener("click", () => {
-
     fetch("/newRoomEntry")
         .then(function (response) {
             return response.json();
@@ -146,14 +147,27 @@ document.getElementById("joinGameButton").addEventListener("click", () => {
     console.log(textbox.value);
 
     if (roomVals.includes(textbox.value)) {
-        // fetch(`/joinRoomEntryNumPlayers?roomCode=${textbox.value}`)
-        //     .then(function (response) {
-        //         if (!response.status === 200){
-        //             throw Error();
-        //         }
-        //     }).catch(function (error) {
-        //         roomAvail = false;
-        //     });
+        fetch(`/joinRoomEntryNumPlayers`)
+            .then(function (response) {
+                return response.json();
+            })
+            .then((data) => {
+                console.log(data);
+
+                let dataList = [];
+
+                for (let room of data) {
+                    dataList.push(room.roomid);
+                }
+
+                console.log(dataList);
+
+                if (dataList.includes(textbox.value)) {
+                    window.location.href = `${baseUrl}gameroom.html?roomId=${textbox.value}`;
+                } else {
+                    alert("Room already has the maximum number of players.");
+                }
+            });
 
         // console.log("test")
         // if (roomAvail) {
@@ -168,9 +182,8 @@ document.getElementById("joinGameButton").addEventListener("click", () => {
         //         }).catch(function (error) {
         //             alert("Room cannot be joined!")
         //         });
-            
+
         // }
-        window.location.href = `${baseUrl}gameroom.html?roomId=${textbox.value}`    
     } else {
         alert("Invalid room Id");
     }

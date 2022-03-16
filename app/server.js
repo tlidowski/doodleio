@@ -137,7 +137,9 @@ io.on("connection", function (socket) {
     });
 
     socket.on("wordPicked", function (data) {
-        socket.to(data.roomNum).emit("wordSent", {chosenWord: data.chosenWord});
+        socket
+            .to(data.roomNum)
+            .emit("wordSent", { chosenWord: data.chosenWord });
     });
 
     socket.on("drawClick", function (data) {
@@ -240,9 +242,8 @@ let validDifficulty = ["easy", "medium", "hard", "expert"];
 app.get("/gameroom", async function (req, res) {
     let diff = req.query["difficulty"];
     if (!validDifficulty.includes(diff)) {
-        console
-            .log("Not a valid difficulty level");
-            
+        console.log("Not a valid difficulty level");
+
         res.send().status(500);
     } else {
         let respWord = await selectFrom(
@@ -250,18 +251,17 @@ app.get("/gameroom", async function (req, res) {
             "words",
             `WHERE difficulty = $1 ORDER BY RANDOM() LIMIT 1`,
             [diff]
-        ).then(function(respWord){
-            res.json({ word: respWord });
-	}).catch(function(error){
-	    res.send().status(500);
-	}
-		);
-	
+        )
+            .then(function (respWord) {
+                res.json({ word: respWord });
+            })
+            .catch(function (error) {
+                res.send().status(500);
+            });
     }
-    
 });
-	
-	//User Authentication
+
+//User Authentication
 app.post("/user", function (req, res) {
     //signup
     let username = req.body.username;
@@ -333,46 +333,56 @@ app.get("/newRoomEntry", function (req, res) {
     });
 });
 
-
-app.get("/joinRoomEntryNumPlayers", async function (req, res) {
-    let room = req.query["roomCode"]
-    let numPlayersToJoin = await selectFrom("numplayers", "rooms", `WHERE roomid = $1`, [room]).then(function(numPlayersToJoin){
-        if (numPlayersToJoin  < 4) {
-            res.status(200);
-        } else {
-            res.status(400);
-        }
-    }).catch(function(error){
-        res.send().status(500);
+app.get("/joinRoomEntryNumPlayers", function (req, res) {
+    // let room = req.query["roomCode"]
+    // let numPlayersToJoin = await selectFrom("numplayers", "rooms", `WHERE roomid = $1`, [room]).then(function(numPlayersToJoin){
+    //     if (numPlayersToJoin  < 4) {
+    //         res.status(200);
+    //     } else {
+    //         res.status(400);
+    //     }
+    // }).catch(function(error){
+    //     res.send().status(500);
+    // });
+    pool.query("SELECT roomID FROM rooms WHERE numplayers < 4;").then(function (
+        response
+    ) {
+        res.send(JSON.stringify(response.rows));
     });
 });
 
-
 app.get("/joinRoomEntryPlaying", async function (req, res) {
-    let room = req.query["roomCode"]
-    let numPlayersToJoin = await selectFrom("isPlaying", "rooms", `WHERE roomid = $1`, [room]).then(function(numPlayersToJoin){
-        console.log(isPlaying);
-    }).catch(function(error){
-        res.send().status(500);
-    });
+    let room = req.query["roomCode"];
+    let numPlayersToJoin = await selectFrom(
+        "isPlaying",
+        "rooms",
+        `WHERE roomid = $1`,
+        [room]
+    )
+        .then(function (numPlayersToJoin) {
+            console.log(isPlaying);
+        })
+        .catch(function (error) {
+            res.send().status(500);
+        });
 });
 
 app.get("/gameStart", function (req, res) {
     let room = req.query["roomCode"];
-    pool.query(
-        "UPDATE rooms SET isPlaying = TRUE where roomid = $1" , [room]
-    ).then(function (response) {
-        res.status(200);
-    }).catch(function(response) {
-        res.status(500).send();
-    });
+    pool.query("UPDATE rooms SET isPlaying = TRUE where roomid = $1", [room])
+        .then(function (response) {
+            res.status(200);
+        })
+        .catch(function (response) {
+            res.status(500).send();
+        });
 });
 
 app.get("/highscore", function (req, res) {
     let userForHS = req.query["username"];
     pool.query("SELECT highscore FROM users WHERE username = $1", [userForHS])
         .then(function (response) {
-            return res.json({ highscore : response.rows[0].highscore});
+            return res.json({ highscore: response.rows[0].highscore });
         })
         .catch(function (error) {
             return res.sendStatus(500);
@@ -383,7 +393,7 @@ app.get("/numgames", function (req, res) {
     let userNG = req.query["username"];
     pool.query("SELECT numgames FROM users WHERE username = $1", [userNG])
         .then(function (response) {
-            return res.json({ numgames : response.rows[0].numgames});
+            return res.json({ numgames: response.rows[0].numgames });
         })
         .catch(function (error) {
             return res.sendStatus(500);
@@ -394,7 +404,7 @@ app.get("/numwon", function (req, res) {
     let userNW = req.query["username"];
     pool.query("SELECT numwon FROM users WHERE username = $1", [userNW])
         .then(function (response) {
-            return res.json({ numwon : response.rows[0].numwon});
+            return res.json({ numwon: response.rows[0].numwon });
         })
         .catch(function (error) {
             return res.sendStatus(500);
@@ -405,7 +415,7 @@ app.get("/totalpoints", function (req, res) {
     let userTP = req.query["username"];
     pool.query("SELECT totalpoints FROM users WHERE username = $1", [userTP])
         .then(function (response) {
-            return res.json({ totalpoints : response.rows[0].totalpoints});
+            return res.json({ totalpoints: response.rows[0].totalpoints });
         })
         .catch(function (error) {
             return res.sendStatus(500);
