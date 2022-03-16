@@ -60,22 +60,25 @@ document.getElementById("logIn").addEventListener("click", function () {
             plaintextPassword: passwordInput.value,
         }),
     }).then(function (response) {
+        console.log(response)
         if (response.status === 200) {
             setCookie(usernameInput.value);
             console.log("Successful Login");
-            alert("You're In!");
+            alert("Successful Login!");
             isSignedIn = true;
             accountStatus(isSignedIn);
+        } else if (response.status === 404) {
+            alert("Username not found. Did you mean to sign up instead?")
+        } else if (response.status === 401){
+            alert("Username and Password do not match.")
         } else {
             console.log("Failed Login");
-            alert("Something went wrong...");
+            alert("Sorry! Something went wrong. Please try again.");
         }
     });
 });
 
 document.getElementById("signUp").addEventListener("click", function () {
-    alert("CLICK");
-    console.log("CLICKED");
     fetch("/user", {
         method: "POST",
         headers: {
@@ -86,6 +89,7 @@ document.getElementById("signUp").addEventListener("click", function () {
             plaintextPassword: passwordInput.value,
         }),
     }).then(function (response) {
+        console.log(response)
         if (response.status === 200) {
             setCookie(usernameInput.value);
             alert("Account Created Successfully.");
@@ -98,7 +102,10 @@ document.getElementById("signUp").addEventListener("click", function () {
                 "Username must be 1-20 characters and Password must be 5-36 characters."
             );
             console.log("Failed New Account");
+        } else if (response.status === 409){
+            alert("Username is taken. Please try another username.")
         } else {
+            alert("Oops. Something went wrong. Please try again.")
             console.log("Failed New Account");
         }
     });

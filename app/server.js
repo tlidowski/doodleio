@@ -284,14 +284,14 @@ app.post("/user", function (req, res) {
         plaintextPassword.length > 36
     ) {
         // username and/or password invalid
-        return res.status(401).send();
+        return res.status(401).send(); ///401 Invalid arguments
     }
 
     pool.query("SELECT username FROM users WHERE username = $1", [username])
         .then(function (response) {
             if (response.rows.length !== 0) {
                 // username already exists
-                return res.status(401).send();
+                return res.status(409).send(); ///409 User already exists
             }
             bcrypt
                 .hash(plaintextPassword, saltRounds)
@@ -302,7 +302,7 @@ app.post("/user", function (req, res) {
                     )
                         .then(function (response) {
                             // account successfully created
-                            res.status(200).send();
+                            res.status(200).send(); ///200 All good
                         })
                         .catch(function (error) {
                             console.log(error);
@@ -442,35 +442,35 @@ app.get("/totalpoints", function (req, res) {
 
 app.post("/auth", function (req, res) {
     //login
-    console.log("Attempting...");
     let username = req.body.username;
     let plaintextPassword = req.body.plaintextPassword;
     pool.query("SELECT userPass FROM users WHERE username = $1", [username])
         .then(function (response) {
-            if (response.rows.length === 0) {
+            console.log(response.rows.length)
+            if (response.rows.length === 0) { ///404 User Not Found
                 console.log("User not found");
                 // username doesn't exist
-                return res.status(401).send();
+                return res.status(404).send();
             }
             let hashedPassword = response.rows[0].userpass;
             bcrypt
                 .compare(plaintextPassword, hashedPassword)
                 .then(function (isSame) {
-                    if (isSame) {
+                    if (isSame) { ///200 Log in
                         // password matched
                         res.status(200).send();
-                    } else {
+                    } else { ///401 Password doesn't match username
                         // password didn't match
                         console.log("Incorrect Password");
                         res.status(401).send();
                     }
                 })
-                .catch(function (error) {
+                .catch(function (error) { ///500 Something bad on our end
                     console.log(error);
                     res.status(500).send(); // server error
                 });
         })
-        .catch(function (error) {
+        .catch(function (error) {///500 Something bad on our end
             console.log(error);
             res.status(500).send(); // server error
         });
