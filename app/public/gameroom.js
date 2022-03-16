@@ -72,6 +72,7 @@ let roundsLeft = 3;
 let isPlaying = false;
 let chosenWord = '';
 let wordRevealInterval = null;
+let curentDiff;
 
 
 // Cookies
@@ -308,7 +309,7 @@ function findSelectedDifficulty() {fetch(`/gameroom?difficulty=${selectedDiff}`)
     if(response.word != ''){
         wordSpace.textContent = response.word;
         chosenWord = response.word;
-        socket.emit("wordPicked", {roomNum: params.get("roomId"), chosenWord: chosenWord});
+        socket.emit("wordPicked", {roomNum: params.get("roomId"), chosenWord: chosenWord, diff: selectedDiff});
         let letterList = chosenWord.split("");
         let pickedIndices = []
         updateWordBox(letterList, pickedIndices);
@@ -320,6 +321,7 @@ function findSelectedDifficulty() {fetch(`/gameroom?difficulty=${selectedDiff}`)
 
 socket.on("wordSent", function (data) {
     chosenWord = data.chosenWord; 
+    currentDiff = data.diff;
     console.log(`Chosen Word is: ${chosenWord}`);
 });
 

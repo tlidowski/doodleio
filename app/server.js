@@ -143,7 +143,7 @@ io.on("connection", function (socket) {
     socket.on("wordPicked", function (data) {
         socket
             .to(data.roomNum)
-            .emit("wordSent", { chosenWord: data.chosenWord });
+            .emit("wordSent", { chosenWord: data.chosenWord, diff: data.diff });
     });
 
     socket.on("drawClick", function (data) {
