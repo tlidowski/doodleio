@@ -606,7 +606,6 @@ function doodlioTurn(){
     }
     wordSelectCountdown()
     if (!isArtist){//find chosen word
-        setTimeout(function () {}, 5*milliPerSec);
         setTimeout(function() {
             let letterList = chosenWord.split("")
             console.log(`New Word: ${letterList}`)
