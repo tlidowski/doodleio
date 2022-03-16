@@ -299,12 +299,8 @@ function findSelectedDifficulty() {fetch(`/gameroom?difficulty=${selectedDiff}`)
     if(response.word != ''){
         wordSpace.textContent = response.word;
         chosenWord = response.word;
-        console.log(chosenWord);
-
         socket.emit("wordPicked", {roomNum: params.get("roomId"), chosenWord: chosenWord});
-
         let letterList = chosenWord.split("");
-        console.log(letterList);
         let pickedIndices = []
         updateWordBox(letterList, pickedIndices);
 
@@ -319,9 +315,7 @@ socket.on("wordSent", function (data) {
 });
 
 function updateWordBox(letterList, pickedIndices) {//Updates wordbox for artist or guesser
-    console.log("Here comes the word!")
     clearWordSpace()
-    console.log(`${isArtist} ${letterList}`)
     let wordContent = ""
     for (letterIndex in letterList) {
         if (isArtist){
@@ -332,7 +326,6 @@ function updateWordBox(letterList, pickedIndices) {//Updates wordbox for artist 
             } else {
                 wordContent+="_ "; //change: create a function to reveal a random character at 30, 10 seconds
             }
-            console.log(`WordContent is ${wordContent}`)
         }
        wordSpace.textContent = wordContent
     }
@@ -362,7 +355,6 @@ function revealLetter(letterList, pickedIndices){ //reveals letters
 
 function clearWordSpace() { //empties the wordBox
     wordSpace.textContent = ""
-    console.log("Clearning box")
 }
 let headerTable = document.getElementById("game-header-table")
 let toolTable = document.getElementById("tool-select-table")
@@ -438,7 +430,6 @@ function checkGuess(guess, oldGuesses){
         oldGuesses.push(guess) //add guess to turnGuess
         //update turnGuess box
     }
-    console.log(`Prior Guesses: ${oldGuesses}`)
 }
 // function pickAWord(difficulty) {
 //     return pickedWord;
@@ -527,10 +518,8 @@ function doodlioTurn(){
     
     if (activePlayers[turn-1] === getCookie("username")) { //user is artist
         console.log(activePlayers[turn-1] + " is artist!");
-        console.log("ALERT: You're an artist this turn.")
         isArtist = true;
     } else { //user is guesser
-        console.log("ALERT: You're guessing this turn.")
         isArtist = false;
     }
     wordSelectCountdown()
@@ -538,9 +527,10 @@ function doodlioTurn(){
         setTimeout(function () {}, 5*milliPerSec);
         setTimeout(function() {
             let letterList = chosenWord.split("")
+            console.log(`New Word: ${letterList}`)
             updateWordBox(letterList, [])
             updateWordBoxGuesser(letterList, [])
-        }, 6*milliPerSec)
+        }, 7*milliPerSec)
     }
     tableHide(isArtist)
     ctx.clearRect(0, 0, doodleBox.width, doodleBox.height);
