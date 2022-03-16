@@ -133,7 +133,7 @@ document.getElementById("newGameButton").addEventListener("click", () => {
                 console.log(data[0]);
                 console.log(window.location.href);
 
-                let baseUrl = window.location.href.replace("home.html", "");
+                let baseUrl = window.location.href.replace("index.html", "");
 
                 window.location.href = `${baseUrl}gameroom.html?roomId=${data[0].roomid}`;
             } else {
@@ -146,7 +146,7 @@ document.getElementById("newGameButton").addEventListener("click", () => {
 document.getElementById("joinGameButton").addEventListener("click", () => {
     let textbox = document.getElementById("joinGameTextField");
 
-    let baseUrl = window.location.href.replace("home.html", "");
+    let baseUrl = window.location.href.replace("index.html", "");
 
     let roomVals = ["OOZK", "QMAJ", "WMJH", "JFRC", "LVNR"];
     let roomAvail = true;
