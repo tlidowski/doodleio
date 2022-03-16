@@ -30,7 +30,7 @@ let correctGuess = false
 let clear = document.getElementById("clearCanvas");
 let urlString = window.location.search;
 let params = new URLSearchParams(urlString);
-
+let timeouts = []
 console.log(params.get("roomId"));
 
 //update header bar
@@ -71,7 +71,8 @@ let turn = 1;
 let roundsLeft = 3;
 let isPlaying = false;
 let chosenWord = '';
-
+let currentDiff;
+let wordRevealInterval = null;
 
 // Cookies
 function getCookie(cname) {
@@ -93,6 +94,7 @@ function getCookie(cname) {
 socket.emit("joinRoom", { username: getCookie("username"), roomNum: params.get("roomId") });
 
 function coolDown() {
+    console.log("in cooldown");
     timerBox.textContent = `Next Turn Starts In: ${cooldownSeconds}`;
     wordSpace.textContent = `${chosenWord}`
     if (cooldownSeconds > 0) {
@@ -106,12 +108,14 @@ function coolDown() {
 
 function countDown() {
     timerBox.textContent = `Time Remaining: ${turnSeconds}`;
-    if (turnSeconds > 0) {
+    console.log(correctGuesses + " and " + (activePlayers.length - 1));
+    if (turnSeconds > 0 && correctGuesses < (activePlayers.length - 1)) {
         turnSeconds--;
     } else {
         isArtist = false;
         timerBox.textContent = "Turn Over";
         clearInterval(countdownInterval);
+        //clearInterval(wordRevealInterval);
 
         if (turn >= activePlayers.length) {
             turn = 1;
@@ -123,6 +127,7 @@ function countDown() {
         if (roundsLeft <= 0) {
             timerBox.textContent = "Game Over!";
             userStatUpdate();
+            document.getElementById("homeButton").removeAttribute("hidden")
         } else {
             cooldownSeconds = 5*(milliPerSec/1000);
             cooldownInterval = setInterval(coolDown, milliPerSec);
@@ -256,6 +261,7 @@ doodleBox.addEventListener("mousemove", emitDraw);
 
 
 //Generate Word Space
+let difficultList = ["easy", "medium", "hard", "expert"]
 let selectedDiff = "easy";
 let easyWordButton = document.getElementById("easyWord");
 let medWordButton = document.getElementById("medWord");
@@ -286,7 +292,7 @@ exWordButton.addEventListener("click", function () {
 });
 
 randWordButton.addEventListener("click", function () {
-    selectedDiff = "random";
+    selectedDiff = difficultList[Math.floor(Math.random()*difficultList.length)];
     selectedDiffBox.textContent = `Selected Difficulty: ${selectedDiff.toUpperCase()}`
 });
 
@@ -303,7 +309,7 @@ function findSelectedDifficulty() {fetch(`/gameroom?difficulty=${selectedDiff}`)
     if(response.word != ''){
         wordSpace.textContent = response.word;
         chosenWord = response.word;
-        socket.emit("wordPicked", {roomNum: params.get("roomId"), chosenWord: chosenWord});
+        socket.emit("wordPicked", {roomNum: params.get("roomId"), chosenWord: chosenWord, diff: selectedDiff});
         let letterList = chosenWord.split("");
         let pickedIndices = []
         updateWordBox(letterList, pickedIndices);
@@ -315,6 +321,8 @@ function findSelectedDifficulty() {fetch(`/gameroom?difficulty=${selectedDiff}`)
 
 socket.on("wordSent", function (data) {
     chosenWord = data.chosenWord; 
+    currentDiff = data.diff;
+    console.log(currentDiff)
     console.log(`Chosen Word is: ${chosenWord}`);
 });
 
@@ -336,9 +344,9 @@ function updateWordBox(letterList, pickedIndices) {//Updates wordbox for artist 
 }
 
 function updateWordBoxGuesser (letterList, pickedIndices){//calls revealLetter 3 times for guesser (CANNOT CALL IN UWB func)
-    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.5)
-    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.75)
-    setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.9)
+    timeouts.push(setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.5))
+    timeouts.push(setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.75))
+    timeouts.push(setTimeout(function() { revealLetter(letterList,pickedIndices); }, 60*milliPerSec*.9))
 }
 
 function revealLetter(letterList, pickedIndices){ //reveals letters
@@ -368,12 +376,13 @@ let wordCountdown = document.getElementById("wordDiffCountdown")
 
 
 function tableHide(isArtist) { //before turn start reset visibility
+    guessTable.setAttribute("hidden","hidden")
     if (isArtist){
         difficultyTable.removeAttribute("hidden")
-        guessTable.setAttribute("hidden","hidden")
+        toolTable.removeAttribute("hidden")
     } else { //is Guesser
         difficultyTable.setAttribute("hidden","hidden")
-        guessTable.removeAttribute("hidden")
+        toolTable.setAttribute("hidden","hidden")
     }
 }
 
@@ -394,6 +403,12 @@ function wordSelectCountdown() {//updates timer in word box, hides diffTable, an
         5*milliPerSec);
     } else {
         wordSpace.textContent = ''
+        setTimeout(function() {
+            guessTable.removeAttribute("hidden");
+          // clearInterval(wordInterval);
+          // TODO add ability to draw
+        },
+        5*milliPerSec)
     }
 }
 
@@ -402,6 +417,7 @@ function updateWordTime(seconds, isArtist) { //updates timer in word box
         wordCountdown.textContent = `Confirm Word Difficulty in: ${seconds}`;
     } else {
         wordSpace.textContent = `Start Guessing in: ${seconds}`;
+        guessTable.setAttribute("hidden", "hidden")
     }
 }
 let oldGuessBox = document.getElementById('past-guesses')
@@ -418,17 +434,19 @@ userGuess.addEventListener('keyup', function(event) {//allows submission in gues
 })
 
 function checkGuess(guess, oldGuesses){
-    if (guess == chosenWord){ //correct guess
+    if (guess.toUpperCase() == chosenWord.toUpperCase()){ //correct guess
         guessTable.setAttribute("hidden","hidden") //hide guessBox
         let score = 0
         correctGuess = true
-        correctGuesses++
+        //correctGuesses++
         if (oldGuesses.length < 2) {
-            let score = 20 - 5*oldGuesses.length
+            score = 20 - 5*oldGuesses.length
         } else {
-            let score = 5
+            score = 5
         }//update score
+        console.log("THIS IS SCORE: " + score);
         wordSpace.textContent = `CORRECT`
+        socket.emit("correctGuessing", {roomNum: params.get("roomId"), username: getCookie("username"), points: score});
     } else {
         correctGuess = false
         oldGuesses.push(guess) //add guess to turnGuess
@@ -444,6 +462,11 @@ function checkGuess(guess, oldGuesses){
 // ******************************* Gameflow! ******************************************
 
 //syncing clocks
+let player1Box = document.getElementById('player1')
+let player2Box = document.getElementById('player2')
+let player3Box = document.getElementById('player3')
+let player4Box = document.getElementById('player4')
+
 socket.on("startClock", function (data) {
     startButton.setAttribute("hidden", true);
     isPlaying = true;
@@ -454,10 +477,26 @@ socket.on("startClock", function (data) {
 
     console.log(playerInfo);
 
+    for (i = 0; i < playerInfo.length; i++){
+        let user = playerInfo[i].username
+        let score = playerInfo[i].points
+        if (i == 0){
+            player1Box.textContent = `${user}: ${score}`.toUpperCase()
+        } else if (i == 1){
+            player2Box.textContent = `${user}: ${score}`.toUpperCase()
+        } else if (i == 2){
+            player3Box.textContent = `${user}: ${score}`.toUpperCase()
+        } else {
+            player4Box.textContent = `${user}: ${score}`.toUpperCase()
+        }
+    }
+
     doodlioTurn();
 });
 
 startButton.addEventListener("click", function() {
+    isArtist = false
+    tableHide("isArtist")
     socket.emit("pressedStart", {roomNum: params.get("roomId")});
 
     let startRoom = params.get("roomId");
@@ -477,6 +516,7 @@ startButton.addEventListener("click", function() {
 //get list of players
 
 socket.on("activePlayers", function (data) {
+    console.log(playerInfo)
     activePlayers = data.activePlayers;
     console.log(activePlayers);
 
@@ -501,21 +541,105 @@ socket.on("activePlayers", function (data) {
             }
         } 
 
-        console.log(playerInfo);
+        console.log(`${playerInfo}`);
     }
+
+    if (!isPlaying){
+        for (i = 0; i < 4; i++){
+            if (i < activePlayers.length) {
+                let user = activePlayers[i]
+                if (i == 0){
+                    player1Box.textContent = `${user} is in`
+                } else if (i == 1){
+                    player2Box.textContent = `${user} is in`
+                } else if (i == 2){
+                    player3Box.textContent = `${user} is in`
+                } else {
+                    player4Box.textContent = `${user} is in`
+                }
+            } else {
+                if (i == 0){
+                    player1Box.textContent = ``
+                } else if (i == 1){
+                    player2Box.textContent = ``
+                } else if (i == 2){
+                    player3Box.textContent = ``
+                } else {
+                    player4Box.textContent = ``
+                }
+            }
+            
+        }
+    }
+    
     
 });
 
+// on correct guesses
+socket.on("correctGuessUpdates", function (data) {
+    correctGuesses += 1;
+    console.log("There was a correct guess")
+    console.log("data: " + data.points);
+    console.log(chosenWord)
+
+    for (let s = 0; s < playerInfo.length; s++){
+        if (data.username === playerInfo[s].username) { //update correct guesser's score
+            playerInfo[s].points += data.points;   
+            console.log(`Giving Guesser ${playerInfo[s].username} ${data.points} points`)
+        } else if (activePlayers[turn-1] === playerInfo[s].username) { //current artist score matches user in database
+            let wordMult = null
+            let diff = ""
+            if (isArtist){
+                diff = selectedDiff
+            } else {
+                diff = currentDiff
+            }
+            if (diff == "easy"){
+                wordMult = 1
+            } else if (diff =="medium"){
+                wordMult = 2
+            } else if (diff == "hard"){
+                wordMult = 3
+            } else if (diff == "expert"){
+                wordMult = 4
+            }
+            console.log(`Giving Artist ${playerInfo[s].username} ${5*wordMult} points`)  //Artist scored by 5*wordDiff (easy=1; expert=4)
+            playerInfo[s].points += 5*wordMult;        
+        }
+        console.log(`New Total: ${playerInfo[s].points}`)
+    }
+
+    console.log(playerInfo)
+    for (i = 0; i < playerInfo.length; i++){
+        let user = playerInfo[i].username
+        let score = playerInfo[i].points
+        if (i == 0){
+            player1Box.textContent = `${user}: ${score}`.toUpperCase()
+        } else if (i == 1){
+            player2Box.textContent = `${user}: ${score}`.toUpperCase()
+        } else if (i == 2){
+            player3Box.textContent = `${user}: ${score}`.toUpperCase()
+        } else {
+            player4Box.textContent = `${user}: ${score}`.toUpperCase()
+        }
+    }
+
+    console.log(playerInfo);
+});
 
 
 function doodlioTurn(){
-    correctGuess = false
-    oldGuessBox.textContent = ''
-    turnGuesses = []
+    while(timeouts.length>0){
+	clearTimeout(timeouts.pop());
+    }
+    correctGuess = false;
+    correctGuesses = 0;
+    oldGuessBox.textContent = '';
+    turnGuesses = [];
     clearWordSpace();
     headerTable.removeAttribute("hidden")
-    turnSpace.textContent = `Turn: ${turn}`
-    roundSpace.textContent = `Round: ${(3-roundsLeft) + 1}`
+    turnSpace.textContent = `Turn: ${turn} / ${activePlayers.length}`
+    roundSpace.textContent = `Round: ${(3-roundsLeft) + 1} / 3`
     artistSpace.textContent = `Artist: ${activePlayers[turn-1]}`
     console.log("CURRENT TURN: " + turn + " and Round: " + ((3-roundsLeft) + 1));
     correctGuesses = 0;
@@ -526,17 +650,18 @@ function doodlioTurn(){
     } else { //user is guesser
         isArtist = false;
     }
+    tableHide(isArtist)
     wordSelectCountdown()
     if (!isArtist){//find chosen word
-        setTimeout(function () {}, 5*milliPerSec);
-        setTimeout(function() {
+
+        wordRevealInterval = setTimeout(function() {
             let letterList = chosenWord.split("")
             console.log(`New Word: ${letterList}`)
             updateWordBox(letterList, [])
             updateWordBoxGuesser(letterList, [])
-        }, 7*milliPerSec)
+            guessTable.removeAttribute("hidden")
+        }, 6*milliPerSec)
     }
-    tableHide(isArtist)
     ctx.clearRect(0, 0, doodleBox.width, doodleBox.height);
 
     turnSeconds = 60*(milliPerSec/1000);
@@ -545,6 +670,8 @@ function doodlioTurn(){
 }
 
 function userStatUpdate () {
+    isArtist = true
+    toolTable.removeAttribute("hidden")
     // find winner;
     let winner = ''; 
     let maxScore = 0;
@@ -565,6 +692,13 @@ function userStatUpdate () {
         }
     }
 
+    //update winner to header
+    roundSpace.textContent = `Winner:`
+    turnSpace.textContent = `${winner}`
+    artistSpace.textContent = `Their Score:`
+    timerBox.textContent = `${maxScore}`
+    wordSpace.textContent = `Free Draw!`
+
     console.log(thisUser);
     console.log("WINNER: " + winner + " with points: " + maxScore);
 
@@ -579,6 +713,7 @@ function userStatUpdate () {
 
     // update stats
     let data = {username: thisUser.username, points: thisUser.points};
+    
 
     fetch("/updateRegStats", {
         method: 'POST',
@@ -596,11 +731,41 @@ function userStatUpdate () {
 		console.log("Bad request");
 	});
 
-    // if (thisUser.points > userHighscore) {
-        
-    // } else {
+    if (thisUser.points > userHighscore) {
+        fetch("/updateHighScore", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        }).then(function (response) {
+            if (!(response.status === 200)) {
+                throw Error();
+            }
+        }).then(function (data) {
+            console.log("Success");
+        }).catch(function (error) {
+            console.log("Bad request");
+        });
+    }
 
-    // }
+    if (thisUser.username === winner) {
+        fetch("/updateNumWon", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        }).then(function (response) {
+            if (!(response.status === 200)) {
+                throw Error();
+            }
+        }).then(function (data) {
+            console.log("Success");
+        }).catch(function (error) {
+            console.log("Bad request");
+        });
+    }
     
 
 

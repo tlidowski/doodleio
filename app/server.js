@@ -136,10 +136,14 @@ io.on("connection", function (socket) {
         io.in(data.roomNum).emit("startClock", {});
     });
 
+    socket.on("correctGuessing", function (data) {
+        io.in(data.roomNum).emit("correctGuessUpdates", {username: data.username, points: data.points});
+    });
+
     socket.on("wordPicked", function (data) {
         socket
             .to(data.roomNum)
-            .emit("wordSent", { chosenWord: data.chosenWord });
+            .emit("wordSent", { chosenWord: data.chosenWord, diff: data.diff });
     });
 
     socket.on("drawClick", function (data) {
@@ -225,7 +229,7 @@ io.on("connection", function (socket) {
     });
 });
 
-app.get("/guess", function (req, res) {
+app.get("/guess", function (req, res) { //doesn't do anything i think but lets keep it in case it does lol
     //Queries guess, user, canGuess
     let body = req.query;
     let guess = body.guess;
@@ -280,14 +284,14 @@ app.post("/user", function (req, res) {
         plaintextPassword.length > 36
     ) {
         // username and/or password invalid
-        return res.status(401).send();
+        return res.status(401).send(); ///401 Invalid arguments
     }
 
     pool.query("SELECT username FROM users WHERE username = $1", [username])
         .then(function (response) {
             if (response.rows.length !== 0) {
                 // username already exists
-                return res.status(401).send();
+                return res.status(409).send(); ///409 User already exists
             }
             bcrypt
                 .hash(plaintextPassword, saltRounds)
@@ -298,7 +302,7 @@ app.post("/user", function (req, res) {
                     )
                         .then(function (response) {
                             // account successfully created
-                            res.status(200).send();
+                            res.status(200).send(); ///200 All good
                         })
                         .catch(function (error) {
                             console.log(error);
@@ -390,23 +394,45 @@ app.get("/highscore", function (req, res) {
 });
 
 app.post("/updateRegStats", function (req, res) {
-
 	let body = req.body;
-
-    let user = body.user;
+    let user = body.username;
     let points = body.points;
-
-    console.log("here");
-
     pool.query(
-            "UPDATE users SET numgames = numgames + 1 where username = $2",
-            [body.points, body.user]
+            "UPDATE users SET numgames = numgames + 1, totalpoints = totalpoints + $1 WHERE username = $2",
+            [points, user]
         ).then(function (response) {
                 return res.send();
         }).catch(function (error) {
                 return res.sendStatus(500);
         });
+});
 
+app.post("/updateHighScore", function (req, res) {
+	let body = req.body;
+    let user = body.username;
+    let points = body.points;
+    pool.query(
+            "UPDATE users SET highscore = $1 WHERE username = $2",
+            [points, user]
+        ).then(function (response) {
+                return res.send();
+        }).catch(function (error) {
+                return res.sendStatus(500);
+        });
+});
+
+app.post("/updateNumWon", function (req, res) {
+	let body = req.body;
+    let user = body.username;
+    let points = body.points;
+    pool.query(
+            "UPDATE users SET numwon = numwon + 1 WHERE username = $1",
+            [user]
+        ).then(function (response) {
+                return res.send();
+        }).catch(function (error) {
+                return res.sendStatus(500);
+        });
 });
 
 app.get("/numgames", function (req, res) {
@@ -444,35 +470,35 @@ app.get("/totalpoints", function (req, res) {
 
 app.post("/auth", function (req, res) {
     //login
-    console.log("Attempting...");
     let username = req.body.username;
     let plaintextPassword = req.body.plaintextPassword;
     pool.query("SELECT userPass FROM users WHERE username = $1", [username])
         .then(function (response) {
-            if (response.rows.length === 0) {
+            console.log(response.rows.length)
+            if (response.rows.length === 0) { ///404 User Not Found
                 console.log("User not found");
                 // username doesn't exist
-                return res.status(401).send();
+                return res.status(404).send();
             }
             let hashedPassword = response.rows[0].userpass;
             bcrypt
                 .compare(plaintextPassword, hashedPassword)
                 .then(function (isSame) {
-                    if (isSame) {
+                    if (isSame) { ///200 Log in
                         // password matched
                         res.status(200).send();
-                    } else {
+                    } else { ///401 Password doesn't match username
                         // password didn't match
                         console.log("Incorrect Password");
                         res.status(401).send();
                     }
                 })
-                .catch(function (error) {
+                .catch(function (error) { ///500 Something bad on our end
                     console.log(error);
                     res.status(500).send(); // server error
                 });
         })
-        .catch(function (error) {
+        .catch(function (error) {///500 Something bad on our end
             console.log(error);
             res.status(500).send(); // server error
         });
