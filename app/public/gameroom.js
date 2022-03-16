@@ -426,11 +426,13 @@ function checkGuess(guess, oldGuesses){
         correctGuess = true
         correctGuesses++
         if (oldGuesses.length < 2) {
-            let score = 20 - 5*oldGuesses.length
+            score = 20 - 5*oldGuesses.length
         } else {
-            let score = 5
+            score = 5
         }//update score
+        console.log("THIS IS SCORE: " + score);
         wordSpace.textContent = `CORRECT`
+        socket.emit("correctGuessing", {roomNum: params.get("roomId"), username: getCookie("username"), points: score});
     } else {
         correctGuess = false
         oldGuesses.push(guess) //add guess to turnGuess
@@ -554,12 +556,27 @@ socket.on("activePlayers", function (data) {
     
 });
 
+// on correct guesses
+socket.on("correctGuessUpdates", function (data) {
+    correctGuesses += 1;
+
+    console.log("data: " + data.points);
+
+    for (let s = 0; s < playerInfo.length; s++){
+        if (data.username === playerInfo[s].username) {
+            playerInfo[s].points += data.points;   
+        }
+    }
+
+    console.log(playerInfo);
+});
 
 
 function doodlioTurn(){
-    correctGuess = false
-    oldGuessBox.textContent = ''
-    turnGuesses = []
+    correctGuess = false;
+    correctGuesses = 0;
+    oldGuessBox.textContent = '';
+    turnGuesses = [];
     clearWordSpace();
     headerTable.removeAttribute("hidden")
     turnSpace.textContent = `Turn: ${turn}`

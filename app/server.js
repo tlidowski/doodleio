@@ -136,6 +136,10 @@ io.on("connection", function (socket) {
         io.in(data.roomNum).emit("startClock", {});
     });
 
+    socket.on("correctGuessing", function (data) {
+        io.in(data.roomNum).emit("correctGuessUpdates", {username: data.username, points: data.points});
+    });
+
     socket.on("wordPicked", function (data) {
         socket
             .to(data.roomNum)
@@ -392,23 +396,17 @@ app.get("/highscore", function (req, res) {
 });
 
 app.post("/updateRegStats", function (req, res) {
-
 	let body = req.body;
-
-    let user = body.user;
+    let user = body.username;
     let points = body.points;
-
-    console.log("here");
-
     pool.query(
-            "UPDATE users SET numgames = numgames + 1 where username = $2",
-            [body.points, body.user]
+            "UPDATE users SET numgames = numgames + 1, totalpoints = totalpoints + $1 WHERE username = $2",
+            [points, user]
         ).then(function (response) {
                 return res.send();
         }).catch(function (error) {
                 return res.sendStatus(500);
         });
-
 });
 
 app.get("/numgames", function (req, res) {
