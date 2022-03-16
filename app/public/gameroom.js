@@ -420,7 +420,7 @@ userGuess.addEventListener('keyup', function(event) {//allows submission in gues
 })
 
 function checkGuess(guess, oldGuesses){
-    if (guess == chosenWord){ //correct guess
+    if (guess.toUpperCase() == chosenWord.toUpperCase()){ //correct guess
         guessTable.setAttribute("hidden","hidden") //hide guessBox
         let score = 0
         correctGuess = true
@@ -565,6 +565,19 @@ socket.on("correctGuessUpdates", function (data) {
     for (let s = 0; s < playerInfo.length; s++){
         if (data.username === playerInfo[s].username) {
             playerInfo[s].points += data.points;   
+        }
+    }
+    for (i = 0; i<playerInfo.length; i++){
+        let user = playerInfo[i].username
+        let score = playerInfo[i].points
+        if (i == 0){
+            player1Box.textContent = `${user}: ${score}`.toUpperCase()
+        } else if (i == 1){
+            player2Box.textContent = `${user}: ${score}`.toUpperCase()
+        } else if (i == 2){
+            player3Box.textContent = `${user}: ${score}`.toUpperCase()
+        } else {
+            player4Box.textContent = `${user}: ${score}`.toUpperCase()
         }
     }
 
