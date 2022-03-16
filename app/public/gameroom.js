@@ -23,8 +23,10 @@ let colors = [
     "#492b16",
     "#737373",
 ];
-let milliPerSec = 100; //Keep default at 1000 for timer
+let milliPerSec = 1000; //Keep default at 1000 for timer
 let easyWords = [];
+let turnGuesses = []
+let correctGuess = false
 
 let urlString = window.location.search;
 let params = new URLSearchParams(urlString);
@@ -92,6 +94,7 @@ socket.emit("joinRoom", { username: getCookie("username"), roomNum: params.get("
 
 function coolDown() {
     timerBox.textContent = `Next Turn Starts In: ${cooldownSeconds}`;
+    wordSpace.textContent = `${chosenWord}`
     if (cooldownSeconds > 0) {
         cooldownSeconds--;
     } else {
@@ -342,14 +345,16 @@ function updateWordBoxGuesser (letterList, pickedIndices){//calls revealLetter 3
 }
 
 function revealLetter(letterList, pickedIndices){ //reveals letters
-    let revealed = false
-    while (!revealed){
-        let position = Math.floor(Math.random() * letterList.length);
-        if (!pickedIndices.includes(position)){
-            pickedIndices.push(position)
-            revealed = true
-            updateWordBox(letterList, pickedIndices)
-        } else {
+    if (!correctGuess){
+        let revealed = false
+        while (!revealed){
+            let position = Math.floor(Math.random() * letterList.length);
+            if (!pickedIndices.includes(position)){
+                pickedIndices.push(position)
+                revealed = true
+                updateWordBox(letterList, pickedIndices)
+            } else {
+            }
         }
     }
 }
@@ -403,27 +408,38 @@ function updateWordTime(seconds, isArtist) { //updates timer in word box
         wordSpace.textContent = `Start Guessing in: ${seconds}`;
     }
 }
-
+let oldGuessBox = document.getElementById('past-guesses')
 let userGuess = document.getElementById("wordguess")
 userGuess.addEventListener('keyup', function(event) {//allows submission in guessbox
     if (event.code === 'Enter') {
         event.preventDefault()
         let lastGuess = userGuess.value
-        if (lastGuess == chosenWord){ //correct guess
-            guessTable.setAttribute("hidden","hidden") //hide guessBox
-            let score = 0
-            if (turnGuesses.length < 2) {
-                let score = 20 - 5*turnGuesses.length
-            } else {
-                let score = 5
-            }//update score
-        } else {
-            turnGuesses.push(lastGuess) //add guess to turnGuess
-            //update turnGuess box
-        }
+        checkGuess(lastGuess, turnGuesses)
+        oldGuessBox.textContent = `Past Guesses: ${turnGuesses}`
         userGuess.value = ''
+
     }
 })
+
+function checkGuess(guess, oldGuesses){
+    if (guess == chosenWord){ //correct guess
+        guessTable.setAttribute("hidden","hidden") //hide guessBox
+        let score = 0
+        correctGuess = true
+        correctGuesses++
+        if (oldGuesses.length < 2) {
+            let score = 20 - 5*oldGuesses.length
+        } else {
+            let score = 5
+        }//update score
+        wordSpace.textContent = `CORRECT`
+    } else {
+        correctGuess = false
+        oldGuesses.push(guess) //add guess to turnGuess
+        //update turnGuess box
+    }
+    console.log(`Prior Guesses: ${oldGuesses}`)
+}
 // function pickAWord(difficulty) {
 //     return pickedWord;
 // }
@@ -498,7 +514,9 @@ socket.on("activePlayers", function (data) {
 
 
 function doodlioTurn(){
-    var turnGuesses = []
+    correctGuess = false
+    oldGuessBox.textContent = ''
+    turnGuesses = []
     clearWordSpace();
     headerTable.removeAttribute("hidden")
     turnSpace.textContent = `Turn: ${turn}`
