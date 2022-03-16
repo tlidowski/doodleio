@@ -71,6 +71,7 @@ let turn = 1;
 let roundsLeft = 3;
 let isPlaying = false;
 let chosenWord = '';
+let wordRevealInterval = null;
 
 
 // Cookies
@@ -93,6 +94,7 @@ function getCookie(cname) {
 socket.emit("joinRoom", { username: getCookie("username"), roomNum: params.get("roomId") });
 
 function coolDown() {
+    console.log("in cooldown");
     timerBox.textContent = `Next Turn Starts In: ${cooldownSeconds}`;
     wordSpace.textContent = `${chosenWord}`
     if (cooldownSeconds > 0) {
@@ -106,12 +108,13 @@ function coolDown() {
 
 function countDown() {
     timerBox.textContent = `Time Remaining: ${turnSeconds}`;
-    if (turnSeconds > 0) {
+    if (turnSeconds > 0 && correctGuesses < (activePlayers.length - 1)) {
         turnSeconds--;
     } else {
         isArtist = false;
         timerBox.textContent = "Turn Over";
         clearInterval(countdownInterval);
+        //clearInterval(wordRevealInterval);
 
         if (turn >= activePlayers.length) {
             turn = 1;
@@ -606,7 +609,8 @@ function doodlioTurn(){
     }
     wordSelectCountdown()
     if (!isArtist){//find chosen word
-        setTimeout(function() {
+
+        wordRevealInterval = setTimeout(function() {
             let letterList = chosenWord.split("")
             console.log(`New Word: ${letterList}`)
             updateWordBox(letterList, [])
