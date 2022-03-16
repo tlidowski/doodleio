@@ -27,7 +27,7 @@ let milliPerSec = 1000; //Keep default at 1000 for timer
 let easyWords = [];
 let turnGuesses = []
 let correctGuess = false
-
+let clear = document.getElementById("clearCanvas");
 let urlString = window.location.search;
 let params = new URLSearchParams(urlString);
 
@@ -228,6 +228,10 @@ function emitDraw (e) {
         drawnf = true;
     }
 }
+
+clear.addEventListener("click", function (e) {
+    ctx.clearRect(0, 0, doodleBox.width, doodleBox.height);
+});
 
 doodleBox.addEventListener("mousedown", function (e) {
     flag = true;
