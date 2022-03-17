@@ -74,7 +74,10 @@ let chosenWord = '';
 let currentDiff;
 let wordRevealInterval = null;
 
-// Cookies
+/* 
+  Get Cookie Function implemented from:
+  https://www.w3schools.com/js/js_cookies.asp
+*/
 function getCookie(cname) {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
