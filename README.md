@@ -27,5 +27,9 @@ If this is successful, the terminal should return the following messsage: ```You
 ### Running on Multiple Devices
 For our demonstration, we were able to access and play on our website with multiple devices. 
 
+This was done with the tool "ngrok", which can be found at this link: https://ngrok.com/. We used the free plan they offer for testing and development. When running this program, a client can broadcast a specific port on their computer and retrieve a URL for others to connect to. 
+
+For our case, in the program, we ran ```ngrok.exe http 3000``` to broadcast localhost:3000 on one laptop to everyone else's. A URL was randomly generated (in the video it was: https://bf07-144-118-77-61.ngrok.io/, which will not work anymore) and other laptops could access the program running simultaneously.
+
 Note: This is not required to test the program locally -- the same functionality can be seen with multiple tabs (see step 18) on the same device. 
 
