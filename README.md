@@ -23,5 +23,9 @@ If this is successful, the terminal should return the following messsage: ```You
 15. [Terminal] Make sure you are still located in the /app folder before running the server.
 16. [Terminal] Run the following command to start the server: ```node server.js```
 17. In any browser, go to localhost:3000 to access the homepage of the website.
-18. If you want to open the program on multiple browser windows, you can use incognito mode since cooies keeps users signed in.
+18. If you want to open the program on multiple browser windows, you can use incognito mode since cookies keeps users signed in.
+### Running on Multiple Devices
+For our demonstration, we were able to access and play on our website with multiple devices. 
+
+Note: This is not required to test the program locally -- the same functionality can be seen with multiple tabs (see step 18) on the same device. 
 
